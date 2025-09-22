@@ -1,0 +1,345 @@
+Model checking: filter(state, P=? [ F<10 "fail" ], s=1)
+
+Prob0: 2 iterations in 0.00 seconds (average 0.000000, setup 0.00)
+
+yes = 1, no = 0, maybe = 12
+
+Computing probabilities...
+Engine: Hybrid
+
+Building hybrid MTBDD matrix... [levels=4, nodes=164] [7.7 KB]
+Adding explicit sparse matrices... [levels=4, num=1, compact] [0.5 KB]
+Creating vector for yes... [dist=2, compact] [0.0 KB]
+Allocating iteration vectors... [2 x 0.1 KB]
+TOTAL: [8.4 KB]
+
+Starting iterations...
+
+Iterative method: 9 iterations in 0.00 seconds (average 0.000000, setup 0.00)
+
+States satisfying filter s=1: 1
+
+Value in the filter state: 0.20096222958117993
+
+Time for model checking: 0.001 seconds.
+
+Result: 0.20096222958117993 (exact floating point)
+
+---------------------------------------------------------------------
+
+Model checking: filter(state, P=? [ F<10 "fail" ], s=2)
+
+Prob0: 2 iterations in 0.00 seconds (average 0.000000, setup 0.00)
+
+yes = 1, no = 0, maybe = 12
+
+Computing probabilities...
+Engine: Hybrid
+
+Building hybrid MTBDD matrix... [levels=4, nodes=164] [7.7 KB]
+Adding explicit sparse matrices... [levels=4, num=1, compact] [0.5 KB]
+Creating vector for yes... [dist=2, compact] [0.0 KB]
+Allocating iteration vectors... [2 x 0.1 KB]
+TOTAL: [8.4 KB]
+
+Starting iterations...
+
+Iterative method: 9 iterations in 0.00 seconds (average 0.000000, setup 0.00)
+
+States satisfying filter s=2: 1
+
+Value in the filter state: 0.43926826263508884
+
+Time for model checking: 0.0 seconds.
+
+Result: 0.43926826263508884 (exact floating point)
+
+---------------------------------------------------------------------
+
+Model checking: filter(state, P=? [ F<10 "fail" ], s=3)
+
+Prob0: 2 iterations in 0.00 seconds (average 0.000000, setup 0.00)
+
+yes = 1, no = 0, maybe = 12
+
+Computing probabilities...
+Engine: Hybrid
+
+Building hybrid MTBDD matrix... [levels=4, nodes=164] [7.7 KB]
+Adding explicit sparse matrices... [levels=4, num=1, compact] [0.5 KB]
+Creating vector for yes... [dist=2, compact] [0.0 KB]
+Allocating iteration vectors... [2 x 0.1 KB]
+TOTAL: [8.4 KB]
+
+Starting iterations...
+
+Iterative method: 9 iterations in 0.00 seconds (average 0.000000, setup 0.00)
+
+States satisfying filter s=3: 1
+
+Value in the filter state: 0.3695379324629518
+
+Time for model checking: 0.0 seconds.
+
+Result: 0.3695379324629518 (exact floating point)
+
+---------------------------------------------------------------------
+
+Model checking: filter(state, P=? [ F<10 "fail" ], s=4)
+
+Prob0: 2 iterations in 0.00 seconds (average 0.000000, setup 0.00)
+
+yes = 1, no = 0, maybe = 12
+
+Computing probabilities...
+Engine: Hybrid
+
+Building hybrid MTBDD matrix... [levels=4, nodes=164] [7.7 KB]
+Adding explicit sparse matrices... [levels=4, num=1, compact] [0.5 KB]
+Creating vector for yes... [dist=2, compact] [0.0 KB]
+Allocating iteration vectors... [2 x 0.1 KB]
+TOTAL: [8.4 KB]
+
+Starting iterations...
+
+Iterative method: 9 iterations in 0.00 seconds (average 0.000000, setup 0.00)
+
+States satisfying filter s=4: 1
+
+Value in the filter state: 0.22021125916248982
+
+Time for model checking: 0.0 seconds.
+
+Result: 0.22021125916248982 (exact floating point)
+
+---------------------------------------------------------------------
+
+Model checking: filter(state, P=? [ F<10 "fail" ], s=5)
+
+Prob0: 2 iterations in 0.00 seconds (average 0.000000, setup 0.00)
+
+yes = 1, no = 0, maybe = 12
+
+Computing probabilities...
+Engine: Hybrid
+
+Building hybrid MTBDD matrix... [levels=4, nodes=164] [7.7 KB]
+Adding explicit sparse matrices... [levels=4, num=1, compact] [0.5 KB]
+Creating vector for yes... [dist=2, compact] [0.0 KB]
+Allocating iteration vectors... [2 x 0.1 KB]
+TOTAL: [8.4 KB]
+
+Starting iterations...
+
+Iterative method: 9 iterations in 0.00 seconds (average 0.000000, setup 0.00)
+
+States satisfying filter s=5: 1
+
+Value in the filter state: 0.27559719597401877
+
+Time for model checking: 0.0 seconds.
+
+Result: 0.27559719597401877 (exact floating point)
+
+---------------------------------------------------------------------
+
+Model checking: filter(state, P=? [ F<10 "fail" ], s=6)
+
+Prob0: 2 iterations in 0.00 seconds (average 0.000000, setup 0.00)
+
+yes = 1, no = 0, maybe = 12
+
+Computing probabilities...
+Engine: Hybrid
+
+Building hybrid MTBDD matrix... [levels=4, nodes=164] [7.7 KB]
+Adding explicit sparse matrices... [levels=4, num=1, compact] [0.5 KB]
+Creating vector for yes... [dist=2, compact] [0.0 KB]
+Allocating iteration vectors... [2 x 0.1 KB]
+TOTAL: [8.4 KB]
+
+Starting iterations...
+
+Iterative method: 9 iterations in 0.00 seconds (average 0.000000, setup 0.00)
+
+States satisfying filter s=6: 1
+
+Value in the filter state: 0.41785446616603433
+
+Time for model checking: 0.0 seconds.
+
+Result: 0.41785446616603433 (exact floating point)
+
+---------------------------------------------------------------------
+
+Model checking: filter(state, P=? [ F<10 "fail" ], s=7)
+
+Prob0: 2 iterations in 0.00 seconds (average 0.000000, setup 0.00)
+
+yes = 1, no = 0, maybe = 12
+
+Computing probabilities...
+Engine: Hybrid
+
+Building hybrid MTBDD matrix... [levels=4, nodes=164] [7.7 KB]
+Adding explicit sparse matrices... [levels=4, num=1, compact] [0.5 KB]
+Creating vector for yes... [dist=2, compact] [0.0 KB]
+Allocating iteration vectors... [2 x 0.1 KB]
+TOTAL: [8.4 KB]
+
+Starting iterations...
+
+Iterative method: 9 iterations in 0.00 seconds (average 0.000000, setup 0.00)
+
+States satisfying filter s=7: 1
+
+Value in the filter state: 0.16250009750767172
+
+Time for model checking: 0.001 seconds.
+
+Result: 0.16250009750767172 (exact floating point)
+
+---------------------------------------------------------------------
+
+Model checking: filter(state, P=? [ F<10 "fail" ], s=8)
+
+Prob0: 2 iterations in 0.00 seconds (average 0.000000, setup 0.00)
+
+yes = 1, no = 0, maybe = 12
+
+Computing probabilities...
+Engine: Hybrid
+
+Building hybrid MTBDD matrix... [levels=4, nodes=164] [7.7 KB]
+Adding explicit sparse matrices... [levels=4, num=1, compact] [0.5 KB]
+Creating vector for yes... [dist=2, compact] [0.0 KB]
+Allocating iteration vectors... [2 x 0.1 KB]
+TOTAL: [8.4 KB]
+
+Starting iterations...
+
+Iterative method: 9 iterations in 0.00 seconds (average 0.000000, setup 0.00)
+
+States satisfying filter s=8: 1
+
+Value in the filter state: 0.11209958121876737
+
+Time for model checking: 0.001 seconds.
+
+Result: 0.11209958121876737 (exact floating point)
+
+---------------------------------------------------------------------
+
+Model checking: filter(state, P=? [ F<10 "fail" ], s=9)
+
+Prob0: 2 iterations in 0.00 seconds (average 0.000000, setup 0.00)
+
+yes = 1, no = 0, maybe = 12
+
+Computing probabilities...
+Engine: Hybrid
+
+Building hybrid MTBDD matrix... [levels=4, nodes=164] [7.7 KB]
+Adding explicit sparse matrices... [levels=4, num=1, compact] [0.5 KB]
+Creating vector for yes... [dist=2, compact] [0.0 KB]
+Allocating iteration vectors... [2 x 0.1 KB]
+TOTAL: [8.4 KB]
+
+Starting iterations...
+
+Iterative method: 9 iterations in 0.00 seconds (average 0.000000, setup 0.00)
+
+States satisfying filter s=9: 1
+
+Value in the filter state: 0.23191995236965482
+
+Time for model checking: 0.006 seconds.
+
+Result: 0.23191995236965482 (exact floating point)
+
+---------------------------------------------------------------------
+
+Model checking: filter(state, P=? [ F<10 "fail" ], s=10)
+
+Prob0: 2 iterations in 0.00 seconds (average 0.000000, setup 0.00)
+
+yes = 1, no = 0, maybe = 12
+
+Computing probabilities...
+Engine: Hybrid
+
+Building hybrid MTBDD matrix... [levels=4, nodes=164] [7.7 KB]
+Adding explicit sparse matrices... [levels=4, num=1, compact] [0.5 KB]
+Creating vector for yes... [dist=2, compact] [0.0 KB]
+Allocating iteration vectors... [2 x 0.1 KB]
+TOTAL: [8.4 KB]
+
+Starting iterations...
+
+Iterative method: 9 iterations in 0.00 seconds (average 0.000000, setup 0.00)
+
+States satisfying filter s=10: 1
+
+Value in the filter state: 0.3649430920006213
+
+Time for model checking: 0.001 seconds.
+
+Result: 0.3649430920006213 (exact floating point)
+
+---------------------------------------------------------------------
+
+Model checking: filter(state, P=? [ F<10 "fail" ], s=11)
+
+Prob0: 2 iterations in 0.00 seconds (average 0.000000, setup 0.00)
+
+yes = 1, no = 0, maybe = 12
+
+Computing probabilities...
+Engine: Hybrid
+
+Building hybrid MTBDD matrix... [levels=4, nodes=164] [7.7 KB]
+Adding explicit sparse matrices... [levels=4, num=1, compact] [0.5 KB]
+Creating vector for yes... [dist=2, compact] [0.0 KB]
+Allocating iteration vectors... [2 x 0.1 KB]
+TOTAL: [8.4 KB]
+
+Starting iterations...
+
+Iterative method: 9 iterations in 0.00 seconds (average 0.000000, setup 0.00)
+
+States satisfying filter s=11: 1
+
+Value in the filter state: 0.2911561099471593
+
+Time for model checking: 0.0 seconds.
+
+Result: 0.2911561099471593 (exact floating point)
+
+---------------------------------------------------------------------
+
+Model checking: filter(state, P=? [ F<10 "fail" ], s=12)
+
+Prob0: 2 iterations in 0.00 seconds (average 0.000000, setup 0.00)
+
+yes = 1, no = 0, maybe = 12
+
+Computing probabilities...
+Engine: Hybrid
+
+Building hybrid MTBDD matrix... [levels=4, nodes=164] [7.7 KB]
+Adding explicit sparse matrices... [levels=4, num=1, compact] [0.5 KB]
+Creating vector for yes... [dist=2, compact] [0.0 KB]
+Allocating iteration vectors... [2 x 0.1 KB]
+TOTAL: [8.4 KB]
+
+Starting iterations...
+
+Iterative method: 9 iterations in 0.00 seconds (average 0.000000, setup 0.00)
+
+States satisfying filter s=12: 1
+
+Value in the filter state: 0.17963744618792027
+
+Time for model checking: 0.001 seconds.
+
+Result: 0.17963744618792027 (exact floating point)
