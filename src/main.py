@@ -10,7 +10,7 @@ import config.config as config
 """
 Generate a PRISM model file from an augmented situation coverage grid (CSV/XLSX) file.
 """
-def generate_prism_file():
+def run_save():
     # ---- ANALYSE ------------------------
     # --- Create problem from data in CSV
     output_folder="t0"
@@ -40,7 +40,7 @@ def generate_prism_file():
         output_folder="t"+str(i)
         
         # create planning object
-        controllerAssessment = controllerAssess.ControllerAssessment(problem_t0)
+        controllerAssessment = controllerAssess.ControllerAssessment(problem_tN)
         
         # get situation,property with "worst violation"
         w_sit, w_prop = controllerAssessment.get_worst_violation()
@@ -62,17 +62,17 @@ def generate_prism_file():
         problem_tN.get_pmc_results()
         print(problem_tN.verification_results)
 
-        print("Ignore states for next iteration:", controllerAssessment.situation_to_avoid)
+        print("Ignore states for next iteration:", situation_to_avoid)
         
         # update last problem
         problem_last = problem_tN
 
-    if i == max_iterations and problem_t0.verification_results['Violation'].any():
+    if i == max_iterations and problem_tN.verification_results['Violation'].any():
         print("Max iterations reached.")
         return 
     
     # ---- Execute ---------------------------
-    if not problem_t0.verification_results['Violation'].any():
+    if not problem_tN.verification_results['Violation'].any():
         print("No violations found. No need to plan.")
         return 
         
@@ -104,15 +104,6 @@ def get_state(all_situations, situation):
 
 
 if __name__ == "__main__":
-
-    # if len(sys.argv) > 1:
-    #     fpath = sys.argv[1]
-    # else:
-    #     print("Usage: python run_dtmc.py <path_to_augmented_grid_csv_file>")
-    #     print("Example: python3 run_dtmc.py ../example_maritime/t_0/input/coverageGrid.csv")
-    #     sys.exit(1)
-
-    # Generate PRISM file
-    prism_file = generate_prism_file()
+    prism_file = run_save()
 
     
