@@ -38,8 +38,7 @@ class ControllerAssessment:
         
         # Change all transitions for the worst_situation to 0.0
         df.loc[df['Situation'].isin(worst_situations), 'Probability'] = 0.0
-
-        print(df)
+        
         # Save the new CSV
         df.to_csv(os.path.join(self.output_folder, "updated_DTMC_data.csv"), index=False)
 

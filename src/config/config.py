@@ -20,7 +20,8 @@ try:
 	PROP_BOUND_PATH = os.path.abspath(config['PATHS']['PROP_BOUND_PATH'])
 	MAX_PLANNING_ITERATIONS = config.getint('PARAMS', 'MAX_PLANNING_ITERATIONS', fallback=5)
 	#SAVE_DTMC_FILES = config.getboolean('PARAMS', 'SAVE_DTMC_FILES', fallback=True)
-	SAVE_DTMC_FILES = True # Always save DTMC files needed for PRISM cmd line
+	SAVE_DTMC_FILES = True # Always save DTMC files, needed for PRISM cmd line
+	VERBOSE = config.getboolean('PARAMS', 'VERBOSE', fallback=False)
 except KeyError as e:
 	raise KeyError(f"Missing section/key in config.ini: {e}")
 

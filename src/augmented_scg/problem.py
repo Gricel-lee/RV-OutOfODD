@@ -103,8 +103,8 @@ class Problem:
     def save_dtmc_files(self: str):
         for situation in self.situations.values():
             situation.save_dtmc()
-            print(f"DTMC for situation '{situation.name}' saved to '{situation.dtmc_file}'")
-    
+            if config.VERBOSE: print(f"[problemClass] DTMC for situation '{situation.name}' saved to '{situation.dtmc_file}'")
+
     def get_props_bounds(self) -> Dict[str, float]:
         prop_bounds = []
         with open(config.PROP_BOUND_PATH, 'r') as f:
@@ -112,45 +112,55 @@ class Problem:
                 line = line.strip()
                 if line:  # skip empty lines
                     prop_bounds.append(line)
-        print(f"Property bounds loaded: {prop_bounds}")
         return prop_bounds
         
+
+
     def get_pmc_results(self):
-        print("Solving using PRISM...")
-        # create df
-        verif_results = pd.DataFrame(columns=['Situation', 'Property', 'Result','Violation','Error'])
-        
-        # for each situation, for each property, run prism and store result
+        """
+        Runs PRISM for each situation and property, evaluates the results, and returns them as a single DataFrame.
+        """
+        results_list = []
+
+        # For each situation, for each property, run prism and store result
         for situation in self.situations.values():
             for i_prop in range(len(self.properties)):
                 prop = self.properties[i_prop]
                 bound = self.prop_bounds[i_prop]
-                # get pmc result
+
+                # Get pmc result
                 result = aux.run_prism_command(situation.dtmc_file, prop)
-                
-                # violation if bound not satisfied
-                print(situation.dtmc_file, prop)
-                print(f"Evaluating: {result} {bound}")
-                print(eval(str(result) + bound))
-                violation = not( eval(str(result) + bound) )
-                # calculate error
-                
+
+                # Determine if the bound is satisfied
+                violation = not( eval(str(result) + bound) ) 
+
+                # Calculate error to bound
+                error = None
                 if violation:
+                    # Simplified and safer error calculation
                     if '<=' in bound:
-                        error = result - float(bound.split('<=')[1])
+                        error = result - float(bound.replace('<=', '').strip())
                     elif '>=' in bound:
-                        error = float(bound.split('>=')[1]) - result
+                        error = float(bound.replace('>=', '').strip()) - result
                     elif '<' in bound:
-                        error = result - float(bound.split('<')[1]) + 1e-6
+                        # Add a small epsilon for strict inequalities
+                        error = result - float(bound.replace('<', '').strip()) + 1e-9
                     elif '>' in bound:
-                        error = float(bound.split('>')[1]) - result + 1e-6
-                else:
-                    error = None
+                        error = float(bound.replace('>', '').strip()) - result + 1e-9
+                
+                # 2. Append a dictionary of results to the list
+                results_list.append({
+                    'Situation': situation.name,
+                    'Property': prop,
+                    'Result': result,
+                    'Violation': violation,
+                    'Error': error
+                })
+                
+                print(f"[PMCresults] '{situation.name}', property '{prop}', result {result}, bound {bound}, error: {error}.")
 
-                verif_results = pd.concat([verif_results, pd.DataFrame({'Situation': [situation.name], 'Property': [prop], 'Result': [result], 'Violation': [violation], 'Error': [error]})])
-                print(f"Situation: {situation.name}, Property: {prop}, Result: {result}, Violation: {violation}, Error: {error}")
-
-        self.verification_results = verif_results
+        # 3. Create the final DataFrame from the list of results
+        self.verification_results = pd.DataFrame(results_list)
         return self.verification_results
 
     def display(self):
@@ -164,6 +174,6 @@ class Problem:
         print(f"Failures ({len(self.failures)}): {self.failures}")
         print(f"Transitions: {self._get_transitions()}")
         print(f"Output folder: {self.output_folder}")
-        print(f"Props: {self.properties}")
-        
-    
+        print(f"Properties: {self.properties}")
+        print(f"Property bounds: {self.prop_bounds}")
+

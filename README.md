@@ -13,7 +13,7 @@ Second, to run SAVE do:
 ```
 source venv/bin/activate && python --version
 cd src/
-python3 run_dtmc.py
+python3 main.py
 ```
 
 

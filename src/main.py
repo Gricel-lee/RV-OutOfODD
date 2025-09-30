@@ -12,18 +12,24 @@ Generate a PRISM model file from an augmented situation coverage grid (CSV/XLSX)
 """
 def run_save():
     # ---- ANALYSE ------------------------
-    # --- Create problem from data in CSV
+    print(f"[main] --- MAPE-K Analysis stage ---")
+    # Create problem from data in CSV
     output_folder="t0"
     csv_file = config.CSV_PATH
     problem_t0 = problem.Problem(output_folder=output_folder, csv_path=csv_file)
-    # ---- Print and save dtmcs
-    problem_t0.display()
+    print(f"[main] Problem created from CSV: {csv_file}")
+    
+    # Print and save dtmcs
+    if config.VERBOSE: problem_t0.display()
     if config.SAVE_DTMC_FILES:
         problem_t0.save_dtmc_files()
-    # --- Get verification results
-    problem_t0.get_pmc_results()
-    print(problem_t0.verification_results)
+    print(f"[main] DTMC files saved in: {problem_t0.output_folder}")
     
+    # Get verification results
+    print("[main] Starting verification process (pre-deployment)...")
+    problem_t0.get_pmc_results()
+    if config.VERBOSE: print(f"[main] Verification results:\n {problem_t0.verification_results}")
+
     # ---- PLAN ---------------------------
     i = 0
     max_iterations = config.MAX_PLANNING_ITERATIONS
@@ -33,7 +39,7 @@ def run_save():
     
     # if violations exist
     while problem_tN.verification_results['Violation'].any() and i <= max_iterations:
-        print(f"--- Planning iteration {i}: Violations found. Planning required.---")
+        print(f"[main] --- MAPE-K Planning stage. Violations found. Planning required, iteration: {i+1}/{config.MAX_PLANNING_ITERATIONS}")
         i += 1
         
         # create new output folder
@@ -44,9 +50,9 @@ def run_save():
         
         # get situation,property with "worst violation"
         w_sit, w_prop = controllerAssessment.get_worst_violation()
-        print("[Planning] Worst violation:\n", w_sit, w_prop)
+        print(f"[main] Worst violation: {w_sit}, {w_prop}")
         situation_to_avoid.append(w_sit)
-        print("[Planning] Situations to avoid:", situation_to_avoid)
+        print(f"[main] Situations to avoid: {situation_to_avoid}")
         #TODO: Choose between sum of errors across situation or single worst violation (situation + property)
     
         # generate new problem with updated transitions (0 for situation_to_avoid)
@@ -55,14 +61,13 @@ def run_save():
         problem_tN = problem.Problem(output_folder=output_folder, csv_path=csv_file, ignore_states=situation_to_avoid)
 
         # ---- Print and save dtmcs
-        problem_tN.display()
+        if config.VERBOSE: problem_tN.display()
         if config.SAVE_DTMC_FILES:
             problem_tN.save_dtmc_files()
         # --- Get verification results
         problem_tN.get_pmc_results()
-        print(problem_tN.verification_results)
-
-        print("Ignore states for next iteration:", situation_to_avoid)
+        if config.VERBOSE: print(problem_tN.verification_results)
+        print("[main] Ignore states for next iteration:", situation_to_avoid)
         
         # update last problem
         problem_last = problem_tN
@@ -73,7 +78,7 @@ def run_save():
     
     # ---- Execute ---------------------------
     if not problem_tN.verification_results['Violation'].any():
-        print("No violations found. No need to plan.")
+        print("[main] No violations found. No need to plan.")
         return 
         
     # Note: Check DeepDecs for ideas:
