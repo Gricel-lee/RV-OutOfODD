@@ -57,18 +57,13 @@ def check_file_extension(fpath):
 
 
 
-def run_prism_command(model_file: str, properties_file: str):
-    # --- Pre-computation Checks ---
-    # # Check if the required files exist before trying to run the command
+def run_prism_command(model_file: str, properties_file: str, init_situation_int: int):
+    # Check if the required files exist before trying to run the command
     if not os.path.exists(model_file):
         print(f"Error: Model file not found at '{model_file}'")
         return
-    # if not os.path.exists(properties_file):
-    #     print(f"Error: Properties file not found at '{properties_file}'")
-    #     return
-
-    # --- Command Execution ---
-    command = [config.PRISM_PATH, model_file, "-pf", properties_file]
+    # Command Execution
+    command = [config.PRISM_PATH, model_file, "-pf", properties_file, "-const", f"init_situation={init_situation_int}"]
     # print(f"Executing command: {' '.join(command)}")
 
     try:

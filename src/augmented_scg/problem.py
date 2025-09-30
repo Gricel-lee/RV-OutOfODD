@@ -7,7 +7,7 @@ from pathlib import Path
 import config.config as config
 
 
-class Problem:
+class SAVEProblem:
 
     def __init__(self, output_folder: str = "tN", csv_path: str = config.CSV_PATH, ignore_states: List[str] = []):
         '''
@@ -18,6 +18,7 @@ class Problem:
         # paths
         self.csv_path = csv_path
         self.output_folder = aux.create_folder(str(Path(self.csv_path).parent), "output_"+output_folder)
+        self.dtmc_file = f"{self.output_folder}/dtmc.prism"
         # vars
         self.df_data = self._load_data_from_csv()
         self.ignore_states = ignore_states
@@ -27,6 +28,8 @@ class Problem:
         self.failures = self._get_failures()
         self.transitions = self._get_transitions()
         self.situations = self._get_situations()
+        # get DTMC
+        self.dtmc = self._get_dtmc(ignore_states=ignore_states)
         # verification results
         self.verification_results = {}
         
@@ -81,6 +84,8 @@ class Problem:
         return transitions
     
     def _get_situations(self) -> List[str]:
+        #Note: must be called after getting states and transitions
+        #Note: situations (are states that are not failures)
         s_names = [state for state in self.states if state.lower().startswith('s')]
         situations = {}
         # set situations
@@ -89,21 +94,40 @@ class Problem:
             situations[s] = sit
         self.situations = situations
         # *after* setting all situations, get DTMCs
-        return self._get_dtmcs(s_names, situations)
-        
-    
-    def _get_dtmcs(self, s_names, situations):
-        # Note: ignore states are needed at runtime for adaptation 
-        for s in s_names:
-            situations[s].get_dtmc(self, self.ignore_states)
         return situations
         
+        
+        
+            
+    def _get_dtmc(self, ignore_states: List[str]=[]) -> str:
+        '''If ignore_states is given, transitions from those states will be removed.'''
 
-    
-    def save_dtmc_files(self: str):
-        for situation in self.situations.values():
-            situation.save_dtmc()
-            if config.VERBOSE: print(f"[problemClass] DTMC for situation '{situation.name}' saved to '{situation.dtmc_file}'")
+        # get all situations and failures from the problem
+        all_situations_n_failures = self.states
+
+        s = ""
+        s+= 'dtmc\n\n'
+        for i_state, situation in enumerate(all_situations_n_failures):
+            s+= f'  const int {situation} = {i_state}; \n'
+        s+= f'\nconst int init_situation;\n'
+        s+= '\nmodule System\n'
+        s+= f'  s : [0..{len(all_situations_n_failures)-1}] init init_situation;\n\n'
+        for i in sorted(self.situations.keys()):
+            if i not in ignore_states:    
+                s+= f'  // Situation: {i}\n'
+                s+= f'  [ ] s={i} -> '
+                for next_situation, prob in self.situations[i].transitions:
+                    s+= f' {prob}:(s\'={next_situation}) + '
+                s = s.rstrip(' + ') + ';\n\n'
+        s+= 'endmodule\n'
+        return s
+
+    def save_dtmc_file(self):
+        if not self.dtmc:
+            raise ValueError("[problemClass] DTMC is empty. Please generate it using get_dtmc() before saving.")
+        with open(self.dtmc_file, 'w') as f:
+            f.write(self.dtmc)
+            if config.VERBOSE: print(f"[problemClass] DTMC saved to '{self.dtmc_file}'")
 
     def get_props_bounds(self) -> Dict[str, float]:
         prop_bounds = []
@@ -129,7 +153,7 @@ class Problem:
                 bound = self.prop_bounds[i_prop]
 
                 # Get pmc result
-                result = aux.run_prism_command(situation.dtmc_file, prop)
+                result = aux.run_prism_command(self.dtmc_file, prop, situation.i_state)
 
                 # Determine if the bound is satisfied
                 violation = not( eval(str(result) + bound) ) 

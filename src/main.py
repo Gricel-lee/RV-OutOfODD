@@ -16,13 +16,13 @@ def run_save():
     # Create problem from data in CSV
     output_folder="t0"
     csv_file = config.CSV_PATH
-    problem_t0 = problem.Problem(output_folder=output_folder, csv_path=csv_file)
+    problem_t0 = problem.SAVEProblem(output_folder=output_folder, csv_path=csv_file)
     print(f"[main] Problem created from CSV: {csv_file}")
     
     # Print and save dtmcs
     if config.VERBOSE: problem_t0.display()
     if config.SAVE_DTMC_FILES:
-        problem_t0.save_dtmc_files()
+        problem_t0.save_dtmc_file()
     print(f"[main] DTMC files saved in: {problem_t0.output_folder}")
     
     # Get verification results
@@ -58,12 +58,12 @@ def run_save():
         # generate new problem with updated transitions (0 for situation_to_avoid)
         csv_file = controllerAssessment.create_new_csv_data(situation_to_avoid, output_folder) # with prob. 0.0 for situation_to_avoid
         # create new problem instance
-        problem_tN = problem.Problem(output_folder=output_folder, csv_path=csv_file, ignore_states=situation_to_avoid)
+        problem_tN = problem.SAVEProblem(output_folder=output_folder, csv_path=csv_file, ignore_states=situation_to_avoid)
 
         # ---- Print and save dtmcs
         if config.VERBOSE: problem_tN.display()
         if config.SAVE_DTMC_FILES:
-            problem_tN.save_dtmc_files()
+            problem_tN.save_dtmc_file()
         # --- Get verification results
         problem_tN.get_pmc_results()
         if config.VERBOSE: print(problem_tN.verification_results)
