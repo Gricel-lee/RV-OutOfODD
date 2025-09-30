@@ -96,31 +96,11 @@ class SAVEProblem:
         # *after* setting all situations, get DTMCs
         return situations
         
-        
-        
             
     def _get_dtmc(self, ignore_states: List[str]=[]) -> str:
-        '''If ignore_states is given, transitions from those states will be removed.'''
-
-        # get all situations and failures from the problem
-        all_situations_n_failures = self.states
-
-        s = ""
-        s+= 'dtmc\n\n'
-        for i_state, situation in enumerate(all_situations_n_failures):
-            s+= f'  const int {situation} = {i_state}; \n'
-        s+= f'\nconst int init_situation;\n'
-        s+= '\nmodule System\n'
-        s+= f'  s : [0..{len(all_situations_n_failures)-1}] init init_situation;\n\n'
-        for i in sorted(self.situations.keys()):
-            if i not in ignore_states:    
-                s+= f'  // Situation: {i}\n'
-                s+= f'  [ ] s={i} -> '
-                for next_situation, prob in self.situations[i].transitions:
-                    s+= f' {prob}:(s\'={next_situation}) + '
-                s = s.rstrip(' + ') + ';\n\n'
-        s+= 'endmodule\n'
+        s = aux.get_dtmc_model(self, ignore_states=ignore_states)
         return s
+    
 
     def save_dtmc_file(self):
         if not self.dtmc:
