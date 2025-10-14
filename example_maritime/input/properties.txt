@@ -1,3 +1,2 @@
-P=?[F<50 s=f1]
-P=?[F<500 s=f2]
+P=?[F<1000 s=f1]
 P=?[F time_close=time_MAX]

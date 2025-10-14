@@ -1,6 +1,6 @@
-
 import os
 import pandas as pd
+import numpy as np
 import sys
 import subprocess
 from typing import List
@@ -70,37 +70,47 @@ def get_dtmc_model(problem_instance, ignore_states: List[str]=[]) -> str:
     s+= '\nmodule System\n'
     s+= f'  s : [0..{len(all_situations_n_failures)-1}] init init_situation;\n\n'
     for i in sorted(problem_instance.situations.keys()):
-        if i not in ignore_states:    
+        p_sum=np.sum([p for next_situation, p in problem_instance.situations[i].transitions])
+        # p_sum=np.sum(problem_instance.situations[i].transitions[:,1])
+        if i not in ignore_states and p_sum>0:    
             s+= f'  // Situation: {i}\n'
             s+= f'  [check_situation] s={i} & t=0 & time_close<time_MAX -> '
             for next_situation, prob in problem_instance.situations[i].transitions:
                 s+= f' {prob}:(s\'={next_situation}) + '
             s = s.rstrip(' + ') + ';\n\n'
     s+= 'endmodule\n'
-    
-    
-    s += '''
-    
+    lines="""
 const int time_MAX;
 
 module timeClose
-    time_close : [0..time_MAX] init 0;
-    //states s2 to s4 are "close" distance
-    [monitor_time] t=1 & (s=s2 | s=s3 | s=s4) & time_close<time_MAX -> 1:(time_close'=time_close+1);
-    //states s5, s6, s7 are "far" distance; s1 is no vessels
-    [monitor_time] t=1 & (s=s1 | s=s5 | s=s6 | s=s7) -> 1:(time_close'=0);
+  time_close : [0..time_MAX] init 0;
+"""
+    close_states=[]
+    for i in sorted(problem_instance.situations.keys()):
+        check_close_mod=(int(i[1:])-2)%problem_instance.close_state_mod==0
+        check_val=int(i[1:])==2
+        if int(i[1:])>1 and (check_close_mod or check_val):
+            close_states.append(i)
+    close_states_str="("
+    for i in close_states[:-1]:
+        close_states_str+=f"s={i} | "
+    close_states_str+=f"s={close_states[-1]})"
+    far_state=close_states_str.replace("|", "&")
+    far_state=far_state.replace("=", "!=")
+    lines+=f"""
+  [monitor_time] t=1 & {close_states_str} & time_close<time_MAX -> 1:(time_close'=time_close+1);
+  [monitor_time] t=1 & {far_state} -> 1:(time_close'=0);
 endmodule
 
 module Turn
-    // 0: checking situation
-    // 1: check number of situations spent at close distance
-    t : [0..1] init 0;
-    [check_situation] true -> 1:(t'=1);
-    [monitor_time] true -> 1:(t'=0);
+  // 0: checking situation
+  // 1: check number of situations spent at close distance
+  t : [0..1] init 0;
+  [check_situation] true -> 1:(t'=1);
+  [monitor_time] true -> 1:(t'=0);
 endmodule
-'''
-    
-    
+"""  
+    s+=lines
     return s
 
 # def get_dtmc_model(problem_instance, ignore_states: List[str]=[]) -> str:
@@ -180,7 +190,7 @@ def run_prism_command(model_file: str, properties_file: str, init_situation_int:
 
 
 
-def parse_prism_output(output_string: str) -> float | None:
+def parse_prism_output(output_string: str) -> float:
     """
     Parses the stdout from PRISM to find and return the numerical result.
     """

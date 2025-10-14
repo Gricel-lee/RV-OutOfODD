@@ -1,6 +1,6 @@
 Situation,Next,Probability
 s1,f1,0.0
-s1,s1,1.0
+s1,s1,0.0
 s1,s2,0.0
 s1,s3,0.0
 s1,s4,0.0

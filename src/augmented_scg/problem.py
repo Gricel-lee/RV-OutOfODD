@@ -28,6 +28,7 @@ class SAVEProblem:
         self.failures = self._get_failures()
         self.transitions = self._get_transitions()
         self.situations = self._get_situations()
+        self.close_state_mod=config.DISTANCE_BINS
         # get DTMC
         self.dtmc = self._get_dtmc(ignore_states=ignore_states)
         # verification results

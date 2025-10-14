@@ -2,8 +2,9 @@ import configparser
 import os
 
 # Create a parser instance
-config = configparser.ConfigParser()
-config_file = 'config.ini'
+# config = configparser.ConfigParser()
+config=configparser.SafeConfigParser(os.environ)
+config_file = f'{os.getenv("SAVE_DIR_PATH")}/src/config.ini'
 if not os.path.exists(config_file):
 	raise FileNotFoundError(f"Configuration file '{config_file}' not found.")
 config.read(config_file)
@@ -23,8 +24,6 @@ try:
 	TIME_MAX = config.getint('PARAMS', 'TIME_MAX', fallback=10)
 	# Verbose output
 	VERBOSE = config.getboolean('PARAMS', 'VERBOSE', fallback=False)
+	DISTANCE_BINS=config.getint('PARAMS', 'DISTANCE_BINS')
 except KeyError as e:
 	raise KeyError(f"Missing section/key in config.ini: {e}")
-
-
-

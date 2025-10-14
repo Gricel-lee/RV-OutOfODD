@@ -79,28 +79,29 @@ def run_save():
     # ---- Execute ---------------------------
     if not problem_tN.verification_results['Violation'].any():
         print("[main] No violations found. No need to plan.")
-        return 
+        return problem_t0
         
     # Note: Check DeepDecs for ideas:
     # https://github.com/ccimrie/DeepDECS/blob/master/case_studies/mobile_robot_collision_limitation/DTMC_model_files/models/model_no_verif.pm
-        
+    
+    
+    
+    
+    
+    
     # generate new dtmcs
     # get new verification results
     # compare results
     
-    #repeat until no violations or max iterations reached    
+    #repeat until no violations or max iterations reached
+    
+    
+    
 
-    return
+    return problem_t0
 
 def get_state(all_situations, situation):
     try:
         return all_situations.index(situation)
     except ValueError:
-        raise ValueError(f"Situation {situation} not found in the list of situations.")
-    
-
-
-if __name__ == "__main__":
-    prism_file = run_save()
-
-    
+        raise ValueError(f"Situation {situation} not found in the list of situations.")    
