@@ -1,0 +1,7 @@
+maritime_casestudy/build/
+maritime_casestudy/*.npz
+maritime_casestudy/*.txt
+maritime_casestudy/*.png
+maritime_casestudy/*.mp4
+maritime_casestudy/*.pickle
+maritime_casestudy/results_analysis/test_output/*.csv
