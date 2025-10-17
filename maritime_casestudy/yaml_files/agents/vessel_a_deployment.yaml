@@ -23,4 +23,4 @@ goal pose:
     target: -30.0
     tolerance: 10.0
 agent type: 0
-results directory: ${SEAMS_DIR_PATH}/results
+results directory: ${SIM_DIR_PATH}/results

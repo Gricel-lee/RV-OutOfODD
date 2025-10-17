@@ -7,7 +7,7 @@ First, set up virtual environment with requirements in ```src/requirements.txt``
 
 Second, to run SAVE do:
 
-1. Set paths in src/config.ini
+1. Set paths in src/config.ini (no longer needed, see `../maritime_casestudy/README.md`)
 
 2. Run by activating the virtual environment, 
 ```

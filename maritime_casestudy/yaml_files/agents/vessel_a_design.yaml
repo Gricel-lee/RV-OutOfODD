@@ -31,4 +31,4 @@ forbidden zones:
       min: 0
       max: 10
 agent type: 0
-results directory: ${SEAMS_DIR_PATH}/results
+results directory: ${SIM_DIR_PATH}/results
