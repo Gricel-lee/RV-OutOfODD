@@ -1,0 +1,30 @@
+goals:
+  location1:
+    x: 00.0
+    y: 1600.0
+    tolerance: 50.0
+
+  location2:
+    x: -1384.0
+    y: 800.0
+    tolerance: 50.0
+
+  location3:
+    x: -1384.0
+    y: -800.0
+    tolerance: 50.0
+
+  location4:
+    x: 00.0
+    y: -1600.0
+    tolerance: 50.0
+
+  location5:
+    x: 1384.0
+    y: -800.0
+    tolerance: 50.0
+
+  location6:
+    x: 1384.0
+    y: 800.0
+    tolerance: 50.0

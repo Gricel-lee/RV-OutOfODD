@@ -1,0 +1,44 @@
+initial pose:
+  x: 
+    min: 0.0
+    max: 0.0
+  y: 
+    min: -10.0
+    max: -10.0
+  theta:
+    min: 90
+    max: 90
+size: 
+  max: 1.0
+  min: 1.0
+vel-size ratio: 
+  linear: 5.0
+  angular: 1.0
+range-size ratio: 30.0
+goal pose:
+  x:
+    target: 0.0
+    tolerance: 0.1
+  y: 
+    target: 38.0
+    tolerance: 0.1
+potential field weights:
+  agent 0:
+    type: 0
+    weight:
+    bins:
+      - 10
+  agent 1:
+    type: 1
+    weight:
+    bins:
+      - 10
+  goal:
+    weight:
+distance zones:
+  - 15.0
+  - 30.0
+results directory:
+agent type: -1
+collision threshold: 0.1
+# situation transitions: 

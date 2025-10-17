@@ -1,0 +1,59 @@
+dtmc
+
+  const int f1 = 0; 
+  const int s1 = 1; 
+  const int s2 = 2; 
+  const int s3 = 3; 
+  const int s4 = 4; 
+  const int s5 = 5; 
+  const int s6 = 6; 
+  const int s7 = 7; 
+
+const int init_situation;
+
+const int max_situations
+
+module System
+  s : [0..8] init init_situation;
+
+  // Situation: s1
+  [check_situation] s=s1 & t=0 & time_close<time_MAX ->  0.72:(s'=s2) +  0.05:(s'=s3) +  0.03:(s'=s4) +  0.01:(s'=s5) +  0.06:(s'=s6) +  0.02:(s'=s7) +  0.04:(s'=f2) +  0.07:(s'=f1);
+
+  // Situation: s2
+  [check_situation] s=s2 & t=0 & time_close<time_MAX ->  0.8:(s'=s1) +  0.05:(s'=s3) +  0.03:(s'=s4) +  0.01:(s'=s5) +  0.01:(s'=s6) +  0.02:(s'=s7) +  0.04:(s'=f2) +  0.04:(s'=f1);
+
+  // Situation: s3
+  [check_situation] s=s3 & t=0 & time_close<time_MAX ->  0.64:(s'=s1) +  0.05:(s'=s2) +  0.03:(s'=s4) +  0.01:(s'=s5) +  0.06:(s'=s6) +  0.02:(s'=s7) +  0.04:(s'=f2) +  0.15:(s'=f1);
+
+  // Situation: s4
+  [check_situation] s=s4 & t=0 & time_close<time_MAX ->  0.5:(s'=s1) +  0.05:(s'=s2) +  0.03:(s'=s3) +  0.01:(s'=s5) +  0.06:(s'=s6) +  0.02:(s'=s7) +  0.04:(s'=f2) +  0.29:(s'=f1);
+
+  // Situation: s5
+  [check_situation] s=s5 & t=0 & time_close<time_MAX ->  0.81:(s'=s1) +  0.05:(s'=s2) +  0.03:(s'=s3) +  0.01:(s'=s4) +  0.01:(s'=s6) +  0.02:(s'=s7) +  0.04:(s'=f2) +  0.03:(s'=f1);
+
+  // Situation: s6
+  [check_situation] s=s6 & t=0 & time_close<time_MAX ->  0.72:(s'=s1) +  0.05:(s'=s2) +  0.03:(s'=s3) +  0.01:(s'=s4) +  0.06:(s'=s5) +  0.02:(s'=s7) +  0.04:(s'=f2) +  0.07:(s'=f1);
+
+  // Situation: s7
+  [check_situation] s=s7 & t=0 & time_close<time_MAX ->  0.81:(s'=s1) +  0.05:(s'=s2) +  0.03:(s'=s3) +  0.01:(s'=s4) +  0.01:(s'=s5) +  0.02:(s'=s6) +  0.04:(s'=f2) +  0.03:(s'=f1);
+
+endmodule
+
+    
+const int time_MAX;
+
+module timeClose
+    time_close : [0..time_MAX] init 0;
+    //states s2 to s4 are "close" distance
+    [monitor_time] t=1 & (s=s2 | s=s3 | s=s4) & time_close<time_MAX -> 1:(time_close'=time_close+1);
+    //states s5, s6, s7 are "far" distance; s1 is no vessels
+    [monitor_time] t=1 & (s=s1 | s=s5 | s=s6 | s=s7) -> 1:(time_close'=0);
+endmodule
+
+module Turn
+    // 0: checking situation
+    // 1: check number of situations spent at close distance
+    t : [0..1] init 0;
+    [check_situation] true -> 1:(t'=1);
+    [monitor_time] true -> 1:(t'=0);
+endmodule

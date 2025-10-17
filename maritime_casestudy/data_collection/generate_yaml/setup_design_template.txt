@@ -1,0 +1,14 @@
+TT: 100
+goal file: ${SEAMS_DIR_PATH}/yaml_files/setup/goal_locations.yaml
+agents:
+  vessel a:
+    N: 5
+    yaml file: ${SEAMS_DIR_PATH}/yaml_files/agents/vessel_a_design.yaml
+  vessel b:
+    N: 0
+    yaml file: ${SEAMS_DIR_PATH}/yaml_files/agents/vessel_b_design.yaml
+mass agents:
+  mass agent:
+    N: 1
+    yaml file: 
+    results file: mass_output.txt

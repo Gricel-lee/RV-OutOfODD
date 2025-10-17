@@ -1,0 +1,39 @@
+initial pose:
+  x: 
+    min: 0.0
+    max: 0.0
+  y: 
+    min: -10.0
+    max: -10.0
+  theta:
+    min: 90
+    max: 90
+size: 
+  max: 1.0
+  min: 1.0
+vel-size ratio: 
+  linear: 0.5
+  angular: 1.0
+range-size ratio: 30.0
+goal pose:
+  x:
+    target: 0.0
+    tolerance: 0.1
+  y: 
+    target: 38.0
+    tolerance: 0.1
+potential field weights:
+  agent 0:
+    type: 0
+    weight: 0.0
+  agent 1:
+    type: 1
+    weight: 0.0
+  goal weight:
+    weight: 1.0
+distance zones:
+  - 10.0
+  - 20.0
+  - 30.0
+agent type: -1
+results directory: ${SEAMS_DIR_PATH}

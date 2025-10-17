@@ -1,0 +1,19 @@
+TT: 100000
+goal file: ../yaml_files/setup/goal_locations.yaml
+results directory: ../results/
+agents:
+  vessel a:
+    N: 10
+    yaml file: ../yaml_files/agents/vessel_a.yaml
+  vessel b:
+    N: 10
+    yaml file: ../yaml_files/agents/vessel_b.yaml
+mass agents:
+  mass agent:
+    N: 1
+    yaml file: ../yaml_files/agents/mass_agent.yaml
+    goal field weight: 1.0
+    neighbour field weight: 0.1
+    safety bubble: 1.0 
+    results file: mass_output.txt
+lanes setup: true
