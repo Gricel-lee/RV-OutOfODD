@@ -17,7 +17,14 @@ class SAVEProblem:
             raise ValueError("csv_path must be a string ending with .csv")
         # paths
         self.csv_path = csv_path
-        self.output_folder = aux.create_folder(str(Path(self.csv_path).parent), "output_"+output_folder)
+        # self.output_folder = aux.create_folder(str(Path(self.csv_path).parent), "output_"+output_folder)
+        output_folder_path=output_folder.split("/")
+        if len(output_folder_path)<2:
+            output_folder_path="."
+        else:
+            output_folder=output_folder_path[-1]
+            output_folder_path_str="/".join(output_folder_path[:-1])
+        self.output_folder = aux.create_folder(str(Path(output_folder_path_str)), "output_"+output_folder)
         self.dtmc_file = f"{self.output_folder}/dtmc.prism"
         # vars
         self.df_data = self._load_data_from_csv()
@@ -28,7 +35,7 @@ class SAVEProblem:
         self.failures = self._get_failures()
         self.transitions = self._get_transitions()
         self.situations = self._get_situations()
-        self.close_state_mod=config.DISTANCE_BINS
+        self.close_state_mod=config.TTC_BINS
         # get DTMC
         self.dtmc = self._get_dtmc(ignore_states=ignore_states)
         # verification results

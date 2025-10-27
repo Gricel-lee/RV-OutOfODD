@@ -21,7 +21,6 @@ class NormalAgent: public agent
     NormalAgent(std::string yaml_file, std::string results_file, double seed) : agent(yaml_file, results_file, seed){};
     void updateVel(agent* neighbour);
   
-    int checkFuture(int lookahead_time, double neigh_pos_x, double neigh_pos_y, double neigh_vel_mag, double neigh_theta, double neigh_radius);
     bool oncomingUpdate(double other_targ_relative_pos_x, double other_target_relative_pos_y, double dist, double other_radius, int time_collision);
     bool overTakingUpdate(double o_pos_x, double o_pos_y, double dist, double o_radius, double other_vel_mag, int time_collision);
     bool makeWayUpdate(double o_relative_theta, double other_radius);

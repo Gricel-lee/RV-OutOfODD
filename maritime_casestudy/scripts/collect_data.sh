@@ -1,5 +1,5 @@
 export PYTHONPATH=":$SIM_DIR_PATH/model_check/:$SAVE_DIR_PATH/src/:"
-for i in $(seq 1 100);
+for i in $(seq 1 10);
 do
   # PRE-DEPLOYMENT PHASE
   cd $SIM_DIR_PATH/data_collection/generate_yaml

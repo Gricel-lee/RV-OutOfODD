@@ -9,7 +9,7 @@ def updateLines(lines, lines_temp, vals):
 		ind=lines_temp.index(val)
 		ind_weight=lines_temp[ind:].index("weight:")+ind
 
-		weight=f"{np.round(np.random.uniform(0,5),1):.2f}"
+		weight=f"{np.round(np.random.uniform(0,3),1):.2f}"
 		print(f"{weight}")
 		## TO REMOVE; only to test pipeline
 		# weight="0.5"
@@ -31,17 +31,18 @@ lines, weights=updateLines(lines, lines_temp, attributes)
 weight_dir="".join([str(weight)+"_" for weight in weights])
 weight_dir=weight_dir[:-1] # Remove floating '_'
 
+line_start="${SIM_DIR_PATH}"
+sim_dir_path=os.environ[line_start[2:-1]]
+controller_dir_path=f"{sim_dir_path}/build/data/controller"
 
-line_start="${SEAMS_DIR_PATH}"
-seams_dir_path=os.environ[line_start[2:-1]]
-Path(f"{seams_dir_path}/build/data/{weight_dir}").mkdir(parents=True, exist_ok=True)
-results_dir=f"{line_start}/build/data/{weight_dir}"
+Path(f"{controller_dir_path}/{weight_dir}").mkdir(parents=True, exist_ok=True)
+results_dir=f"{line_start}/build/data/controller/{weight_dir}"
 
 ind_dir=lines_temp.index("results directory:")
 lines[ind_dir]=f"{lines[ind_dir][:-1]} {results_dir}\n"
 
-Path(f"{seams_dir_path}/build/yaml_files/{weight_dir}").mkdir(parents=True, exist_ok=True)
-with open(f"{seams_dir_path}/build/yaml_files/{weight_dir}/mass_agent_{weight_dir}.yaml", 'w') as f:
+Path(f"{controller_dir_path}/{weight_dir}").mkdir(parents=True, exist_ok=True)
+with open(f"{controller_dir_path}/{weight_dir}/mass_agent_{weight_dir}.yaml", 'w') as f:
 	for line in lines:
 		f.write(line)
 f.close()
@@ -56,8 +57,9 @@ lines_temp=[line.strip() for line in lines_temp]
 
 ind_mass_agent=lines_temp.index("mass agent:")
 ind_yaml_file=lines_temp[ind_mass_agent:].index("yaml file:")+ind_mass_agent
-filename_start="${SEAMS_DIR_PATH}/build/yaml_files/"+weight_dir+"/mass_agent_"
+filename_start=f"{controller_dir_path}/"+weight_dir+"/mass_agent_"
 lines_master[ind_yaml_file]=f"{lines_master[ind_yaml_file][:-1]} {filename_start}{weight_dir}.yaml\n"
-with open(f"{seams_dir_path}/build/yaml_files/setup_design.yaml", 'w') as f:
+Path(f"{sim_dir_path}/build/yaml_files").mkdir(parents=True, exist_ok=True)
+with open(f"{sim_dir_path}/build/yaml_files/setup_design.yaml", 'w') as f:
 	for line in lines_master:
 		f.write(line)

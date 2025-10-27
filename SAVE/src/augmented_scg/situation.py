@@ -9,7 +9,7 @@ class Situation:
         self.name = name
         self.problem = problem
         self.transitions: List[Tuple[str, float]] = transitions if transitions is not None else []
-        self.i_state = self.problem.states.index(name) if name in self.problem.states else -1 # integer value of state variable in the DTMC
+        self.i_state = self.problem.states.index(name)-1 if name in self.problem.states else -1 # integer value of state variable in the DTMC
         
 
     def display(self):

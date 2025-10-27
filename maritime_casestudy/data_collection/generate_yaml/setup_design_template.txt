@@ -1,12 +1,13 @@
-TT: 100
-goal file: ${SEAMS_DIR_PATH}/yaml_files/setup/goal_locations.yaml
+TT: 10000
+EE: 10
+goal file: ${SIM_DIR_PATH}/yaml_files/setup/goal_locations.yaml
 agents:
   vessel a:
-    N: 5
-    yaml file: ${SEAMS_DIR_PATH}/yaml_files/agents/vessel_a_design.yaml
+    N: 10
+    yaml file: ${SIM_DIR_PATH}/yaml_files/agents/vessel_a_design.yaml
   vessel b:
-    N: 0
-    yaml file: ${SEAMS_DIR_PATH}/yaml_files/agents/vessel_b_design.yaml
+    N: 10
+    yaml file: ${SIM_DIR_PATH}/yaml_files/agents/vessel_b_design.yaml
 mass agents:
   mass agent:
     N: 1

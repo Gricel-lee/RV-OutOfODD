@@ -70,6 +70,8 @@ void agent::initialiseAgent()
  // Robot sensor parameters
   range=radius*config["range-size ratio"].as<double>();
   vel_max=radius*config["vel-size ratio"]["linear"].as<double>();
+  new_vel_mag=vel_max;
+  vel_mag=vel_max;
   vel_theta_max=config["vel-size ratio"]["angular"].as<double>()/radius;
   agent_type=config["agent type"].as<int>();
 
@@ -136,7 +138,11 @@ void agent::setBodyPose(float _x_pos, float _y_pos, float _theta)
   b2Vec2 position=(b2Vec2){_x_pos, _y_pos};//b2Body_GetPosition(getBodyID());
   // b2Rot rotation=b2Body_GetRotation(getBodyID());
   b2Rot heading=b2MakeRot(_theta);
-  b2Body_SetTransform(getBodyID(),position,heading);
+  printf("\t\t-Setting transform:  %f  %f  %f\n", _x_pos, _y_pos, _theta);
+  getBodyID();
+  printf("\t\t-Tested bodyID\n");
+  b2Body_SetTransform(bodyID,position,heading);
+  printf("\t\t-Transform set!\n");
 }
 
 // b2Body* agent::getBody()
@@ -275,9 +281,9 @@ double agent::getVelMag()
 
 void agent::updateVelMag()
 {
-  vel_mag=new_vel_mag;
-  // vel_mag=0.0;
-  // if (vel_mag==0) vel_mag=0.001;
+  if (new_vel_mag>vel_max) vel_mag=vel_max;
+  else if (new_vel_mag<0) vel_mag=0;
+  else vel_mag=new_vel_mag;
   new_vel_mag=vel_max;
   min_dist=2*range;
   // printf("New vel mag:  %f / %f\n", vel_mag, vel_max);
@@ -314,6 +320,41 @@ void agent::agentNeighReset()
 int agent::getAgentType()
 {
   return agent_type;
+}
+
+int agent::checkFuture(int lookahead_time, double neigh_pos_x, double neigh_pos_y, double neigh_vel_mag, double neigh_theta, double neigh_radius)
+{
+  b2Vec2 position=b2Body_GetPosition(getBodyID());
+  double pos_x=position.x;
+  double pos_y=position.y;
+  double vel_x=getVelX();
+  double vel_y=getVelY();
+
+  double neigh_vel_x=cos(neigh_theta)*neigh_vel_mag;
+  double neigh_vel_y=sin(neigh_theta)*neigh_vel_mag;
+  double dt=1/60.0;
+
+  double prev_dist=range;
+
+  for (int t=1; t<lookahead_time; ++t)
+  {
+    // printf("Sanity check at time step %i at vel (%f, %f):\n", t, vel_x, vel_y);
+    // printf("\t- Starting pos:  (%f,%f)\n",pos_x,pos_y);
+    pos_x+=dt*vel_x;
+    pos_y+=dt*vel_y;
+    neigh_pos_x+=dt*neigh_vel_x;
+    neigh_pos_y+=dt*neigh_vel_y;
+    // printf("\t- Next pos:  (%f,%f)\n", pos_x,pos_y);
+    // printf("\t- Original pos:  (%f,%f)\n", getBody()->GetPosition().x,getBody()->GetPosition().y);
+
+    double dist_x=(neigh_pos_x-pos_x);
+    double dist_y=(neigh_pos_y-pos_y);
+    double dist=sqrt(dist_x*dist_x+dist_y*dist_y);
+    if (dist-radius-neigh_radius<0) return t;
+    // else if (prev_dist-dist<0) break;
+    prev_dist=dist;
+  }
+  return -1;
 }
 
 void agent::recordStep(int t)

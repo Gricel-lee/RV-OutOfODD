@@ -31,12 +31,14 @@ void MassAgent::updateVel()
  // Combine potential fields
   double pf_x=pf_x_g+pf_x_neigh;
   double pf_y=pf_y_g+pf_y_neigh;
+  // printf("\t\t-MASS PF vals:  %f  %f  %f  %f\n", pf_y_g, pf_y_neigh, pf_x_g, pf_x_neigh);
 
   pf_x_neigh=0;
   pf_y_neigh=0;
 
  // Update theta acceleration
   targ_theta=atan2(pf_y, pf_x);
+  // printf("\t\t-MASS update:  %f  %f\n", targ_theta, heading);
   double theta_diff=targ_theta-heading;
   if (theta_diff<-M_PI) theta_diff+=2*M_PI;
   else if (theta_diff>M_PI) theta_diff-=2*M_PI;
@@ -77,6 +79,10 @@ void MassAgent::updateSituation(agent* neighbour)
   double o_theta=atan2(dist_y, dist_x);
   dist-=(radius+other_radius);
 
+  float neigh_vel_mag=neighbour->getVelMag();
+  float neigh_theta=neighbour->getTheta();
+  float neigh_radius=neighbour->getRadius();
+
   int neighbour_type=neighbour->getAgentType();
 
  // Update situation info
@@ -86,23 +92,32 @@ void MassAgent::updateSituation(agent* neighbour)
   
   if (dist<collision_thresh)
   {
-    closest_dist_zone=-1;
-    printf("COLLISION\n");
+    shortest_ttc_bin=-2;
+    // printf("COLLISION\n");
     return;
   }
 
-  int temp_dist_zone=0;
-  for (std::map<float, int>::iterator it=distance_zones.begin(); it!=distance_zones.end(); it++)
-  {
-    if (dist<it->first) temp_dist_zone=it->second;
+  int ttc=checkFuture(mass_lookahead_time, other_pos_x, other_pos_y, neigh_vel_mag, neigh_theta, neigh_radius);
+  // printf("\t\t-Future checked!\n");
+  if (ttc<0) ttc=mass_lookahead_time+1;
+  if (ttc<ttc_violation) shortest_ttc_bin=-1;
+  else
+  { 
+    int temp_ttc_bin=0;
+    for (std::map<int, int>::iterator it=TTC.begin(); it!=TTC.end(); it++)
+    {
+      if (ttc<it->first) temp_ttc_bin=it->second;
+    }
+    if (temp_ttc_bin<shortest_ttc_bin) shortest_ttc_bin=temp_ttc_bin;
   }
-  if (temp_dist_zone<closest_dist_zone) closest_dist_zone=temp_dist_zone;
+
   return;
 }
 
 int MassAgent::situationID()
 {
-  if (closest_dist_zone==-1) return 0;
+  if (shortest_ttc_bin==-1) return 0; // TTC violation
+  else if (shortest_ttc_bin==-2) return 1; // Collision violation
 
   int situation_id=0;
   vector<int> vec_situation;
@@ -111,8 +126,8 @@ int MassAgent::situationID()
     int max_val=situation_neigh_comp[key][0]*situation_neigh_comp[key][1];
     situation_id+=(min(max_val,situation_neigh_comp[key][1]*val));
   }
-  situation_id+=(closest_dist_zone+1);
-  int offset=distance_zones.size();
+  situation_id+=(shortest_ttc_bin+2); // Add for fail states
+  int offset=TTC.size();
   situation_id=max(1, situation_id-offset);
   return situation_id;
 }
@@ -141,18 +156,34 @@ void MassAgent::updateNeighPF(agent* neighbour)
   double o_theta=atan2(dist_y, dist_x);
   dist-=(radius+other_radius);
 
+
+  float neigh_vel_mag=neighbour->getVelMag();
+  float neigh_theta=neighbour->getTheta();
+  float neigh_radius=neighbour->getRadius();
+
+  // printf("\t\t-Checking future...%i\n", mass_lookahead_time);
+
   int neighbour_type=neighbour->getAgentType();
 
  // Update situation info
   neighbour_types[neighbour_type]+=1;
   // Go through (sorted) distance zones keys, and find ID
     // Note: should be sorted by default
-  int temp_dist_zone=0;
-  for (std::map<float, int>::iterator it=distance_zones.begin(); it!=distance_zones.end(); it++)
-  {
-    if (dist<it->first) temp_dist_zone=it->second;
+  // printf("\t\t-Checking bins...\n");
+  int ttc=checkFuture(mass_lookahead_time, other_pos_x, other_pos_y, neigh_vel_mag, neigh_theta, neigh_radius);
+  // printf("\t\t-Future checked!\n");
+  if (ttc<0) ttc=mass_lookahead_time+1;
+  if (ttc<ttc_violation) shortest_ttc_bin=-1;
+  else
+  { 
+    int temp_ttc_bin=0;
+    for (std::map<int, int>::iterator it=TTC.begin(); it!=TTC.end(); it++)
+    {
+      if (ttc<it->first) temp_ttc_bin=it->second;
+    }
+    if (temp_ttc_bin<shortest_ttc_bin) shortest_ttc_bin=temp_ttc_bin;
   }
-  if (temp_dist_zone<closest_dist_zone) closest_dist_zone=temp_dist_zone;
+  // printf("\t\t-Bins checked!\n");
 
  // Apply PF with corresponding agent type weight
   float neigh_weight=pf_weights[neighbour_type];
@@ -176,12 +207,22 @@ void MassAgent::resetSituation()
   {
     neighbour_types[it->first]=0;
   }
-  closest_dist_zone=size(distance_zones);
+  shortest_ttc_bin=size(TTC);
 }
 
 float MassAgent::getCollisionThresh()
 {
   return collision_thresh;
+}
+
+int MassAgent::getTTCThresh()
+{
+  return ttc_violation;
+}
+
+int MassAgent::getShortestTTC()
+{
+  return shortest_ttc_bin;
 }
 
 void MassAgent::recordStep(int t)
@@ -216,7 +257,7 @@ void MassAgent::recordStep(int t)
   double heading=b2Rot_GetAngle(rotation);
 
   int next_state=situationID();
-  state_trans_count[prev_situation][next_state]+=1;
+  // state_trans_count[prev_situation][next_state]+=1;
           
   // printf("\t - State transition is: %i -> %i\n", prev_situation, next_state);
 
@@ -240,6 +281,13 @@ void MassAgent::recordStep(int t)
   outfile.close();
 }
 
+
+void MassAgent::updateTransitionMatrix()
+{
+  int next_state=situationID();
+  state_trans_count[prev_situation][next_state]+=1;
+}
+
 void MassAgent::saveTransitionMatrix()
 {
   /* 
@@ -250,15 +298,16 @@ void MassAgent::saveTransitionMatrix()
   outfile.open(results_dir+"/"+transition_filename);
 
  // Write column info
-  outfile << ",f1,";
-  for(int i=1; i<total_situations-1; ++i) outfile<<"s"+to_string(i)+",";
-  outfile << "s"+to_string(total_situations-1) << endl;
+  outfile << ",f1,f2,";
+  for(int i=2; i<total_situations-1; ++i) outfile<<"s"+to_string(i-1)+",";
+  outfile << "s"+to_string(total_situations-2) << endl;
  // Create transition matrix, and write row info
   for(int i=0; i<total_situations; ++i)
   {
     string s;
     if (i==0) s="f1,";
-    else s="s"+to_string(i)+",";
+    else if (i==1) s="f2,";
+    else s="s"+to_string(i-1)+",";
     outfile << s.data();
     for(int j=0; j<total_situations-1; ++j)
     {
@@ -267,27 +316,26 @@ void MassAgent::saveTransitionMatrix()
     outfile << to_string(state_trans_count[i][-1]) << endl;
   }
   outfile.close();
-  printf("PERFORMING MODEL CHECKING\n");
-  modelCheck();
+  // printf("PERFORMING MODEL CHECKING\n");
+  // modelCheck();
 }
 
 bool MassAgent::modelCheck()
 {
+  printf("\t-Verifying controllers\n");
   Py_Initialize();
-  printf("\t-Interpreter set\n");
+  printf("\t\t-Interpreter set\n");
   try
   {
     object model_check_module=import("model_check");
-    printf("\t-Module imported\n");
+    printf("\t\t-Module imported\n");
     string csv_filename=results_dir+"/"+transition_filename;
     bool result=extract<bool>(model_check_module.attr("testFunc")(csv_filename));
-    printf("\t-Function imported\n");
+    printf("\t\t-Function imported\n");
     string success="no violations\n";
     if (!result) success="violations occurred\n";
-    printf("\t-Number of failures:  %s\n", success.data());
-
+    // printf("\t-Number of failures:  %s\n", success.data());
     return result;
-
   }
   catch (const error_already_set&)
   {
@@ -296,5 +344,5 @@ bool MassAgent::modelCheck()
     return false;
   // //   // return 1;
   }
-  printf("\t - Complete!\n");
+  printf("\t\t-Complete!\n");
 }

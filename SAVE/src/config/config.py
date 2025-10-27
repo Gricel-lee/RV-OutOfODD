@@ -24,6 +24,6 @@ try:
 	TIME_MAX = config.getint('PARAMS', 'TIME_MAX', fallback=10)
 	# Verbose output
 	VERBOSE = config.getboolean('PARAMS', 'VERBOSE', fallback=False)
-	DISTANCE_BINS=config.getint('PARAMS', 'DISTANCE_BINS')
+	TTC_BINS = config.getint('PARAMS', 'TTC_BINS')
 except KeyError as e:
 	raise KeyError(f"Missing section/key in config.ini: {e}")

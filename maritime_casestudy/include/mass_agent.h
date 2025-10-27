@@ -16,7 +16,6 @@ class MassAgent : public agent
 
       collision_thresh=config["collision threshold"].as<float>();
 
-
      // Set potential field weight
       YAML::Node potential_field_weights=config["potential field weights"];
       {
@@ -49,24 +48,25 @@ class MassAgent : public agent
         }
       }
 
-     // Set up distance zones
+     // Set up TTC bins
       /* 
-        TODO: Set up distance zones so that only n-1 needs to be in YAML file, and anything above is considered in last zone
+        TODO: Set up TTC bins so that only n-1 needs to be in YAML file, and anything above is considered in last bin
       */ 
-      vector<float> dists=config["distance zones"].as<vector<float>>();
-      for (vector<float>::iterator it=dists.begin(); it!=dists.end(); it++)
+      ttc_violation=config["TTC violation"].as<int>();
+      vector<int> dists=config["TTC bins"].as<vector<int>>();
+      for (vector<int>::iterator it=dists.begin(); it!=dists.end(); it++)
       {
-        distance_zones[*it]=-1;
+        TTC[*it]=-1;
       }
       int zone_count=0;
-      for (map<float, int>::iterator it=distance_zones.begin(); it!=distance_zones.end(); it++)
+      for (map<int, int>::iterator it=TTC.begin(); it!=TTC.end(); it++)
       {
-        distance_zones[it->first]=zone_count;
+        TTC[it->first]=zone_count;
         zone_count++;
       }
-      closest_dist_zone=distance_zones.size();
+      shortest_ttc_bin=TTC.size();
 
-      int mult_const=distance_zones.size();
+      int mult_const=TTC.size();
       for (auto const& [key, val] : situation_neigh_comp)
       {
         situation_neigh_comp[key].push_back(mult_const);
@@ -81,12 +81,12 @@ class MassAgent : public agent
       stream << std::fixed << std::setprecision(1) << goal_weight;
       std::string s=stream.str();
       transition_filename+=(s+".csv");
-      total_situations=mult_const-(distance_zones.size()-1)+1; // Remove distance combos when no visible neighbours; add 1 for fail state
+      total_situations=mult_const-(TTC.size()-1)+2; // Remove TTC combos when no visible neighbours; add 2 for fail states
      // Set up transitions output file (if it does not exist); otherwise load current transition count
-      printf("\t - Does file [%s] exist:  %i\n", (results_dir+"/"+transition_filename).data(), filesystem::exists(results_dir+"/"+transition_filename));
+      // printf("\t - Does file [%s] exist:  %i\n", (results_dir+"/"+transition_filename).data(), filesystem::exists(results_dir+"/"+transition_filename));
       if(!filesystem::exists(results_dir+"/"+transition_filename))
       {
-        printf("\t - Creating new CSV file for transitions\n");
+        printf("\t\t-Creating new CSV file for transitions\n");
         outfile.open(results_dir+"/"+transition_filename);
        // Write column info
         outfile << ",";
@@ -111,7 +111,7 @@ class MassAgent : public agent
       }
       else
       {
-        printf("\t - Loading CSV file for transitions\n");
+        printf("\t\t-Loading CSV file for transitions\n");
         string output_file=results_dir+'/'+transition_filename;
         vector<pair<string, vector<string>>> transition_info=readCSV(output_file);
         vector<pair<string, vector<string>>> transition_info_no_labels(transition_info.begin()+1, transition_info.end());
@@ -137,6 +137,7 @@ class MassAgent : public agent
           state_trans_count.push_back(transition_counts);
         }
       }
+      mass_lookahead_time=config["look ahead time"].as<int>();
     };
     void updateVel();
     void updateNeighPF(agent* neighbour);
@@ -146,15 +147,19 @@ class MassAgent : public agent
     void resetSituation();
     void recordStep(int t);
     void updateSituation(agent* neighbour);
+    void updateTransitionMatrix();
     void saveTransitionMatrix();
     bool modelCheck();
     float getCollisionThresh();
+    int getTTCThresh();
+    int getShortestTTC();
+
 
   private:
     double goal_weight;
     // double neigh_weight;
-    double pf_x_neigh;
-    double pf_y_neigh;
+    double pf_x_neigh=0.0;
+    double pf_y_neigh=0.0;
 
    // Potential field weights
     map<int, float> pf_weights;
@@ -163,10 +168,12 @@ class MassAgent : public agent
     map<int, int> neighbour_types; // To keep track of number of neighbours w.r.t. agent type
     map<vector<int>, int> neigh_count_bins; // <type, number> -> bin
     map<int, vector<int>>  situation_neigh_comp; // <type, <bin count, multiplicative constant for calculating state>
-    map<float, int> distance_zones; // Key is max distance of zone
-    int closest_dist_zone;
+    map<int, int> TTC; // TTC=time to collision; key is max time of bin
+    int shortest_ttc_bin;
 
     float collision_thresh;
+    int ttc_violation;
+    int mass_lookahead_time;
     // map<vector<int>, int> situation;
 
    // Transition info

@@ -110,58 +110,16 @@ void NormalAgent::updateVel(agent* neighbour)
     // if (updated && time_collision>1) printf("In crossing event collision will occur in %i timesteps\n", time_collision);
   }
 
-  // if (!updated && neigh_ego_relative_pos_x>-neigh_radius && dist<cmf_dist)
-  // if (neigh_ego_relative_pos_x>-neigh_radius && dist<cmf_dist)
-  // {
-  //   double turn_angle=atan2(dist_y, dist_x);
-  //   new_theta_acc=-turn_angle;
-  //   updated=true;
-  // }
-
+  // printf("\t-Calculating vel:\n");
   if (time_collision>1)
   {
     double max_crash_time=600.0;
     double offset_vel=1;
     double temp_vel_mag=(vel_mag*time_collision)/(max_crash_time*offset_vel);
+    // printf("\t\t-Temp vel mag is:  %fx%f\n", vel_mag, time_collision);
     if (temp_vel_mag<new_vel_mag) new_vel_mag=temp_vel_mag;
   }
-  // else
-  // {
-  //   double temp_vel_mag=vel_max*(dist/(range-radius-neigh_radius));
-  // }
-  // if (updated) min_dist=dist;
-
-}
-
-int NormalAgent::checkFuture(int lookahead_time, double neigh_pos_x, double neigh_pos_y, double neigh_vel_mag, double neigh_theta, double neigh_radius)
-{
-  b2Vec2 position=b2Body_GetPosition(getBodyID());
-  double pos_x=position.x;
-  double pos_y=position.y;
-  double vel_x=getVelX();
-  double vel_y=getVelY();
-
-  double neigh_vel_x=cos(neigh_theta)*neigh_vel_mag;
-  double neigh_vel_y=sin(neigh_theta)*neigh_vel_mag;
-  double dt=1/60.0;
-
-  for (int t=1; t<lookahead_time; ++t)
-  {
-    // printf("Sanity check at time step %i at vel (%f, %f):\n", t, vel_x, vel_y);
-    // printf("\t- Starting pos:  (%f,%f)\n",pos_x,pos_y);
-    pos_x+=dt*vel_x;
-    pos_y+=dt*vel_y;
-    neigh_pos_x+=dt*neigh_vel_x;
-    neigh_pos_y+=dt*neigh_vel_y;
-    // printf("\t- Next pos:  (%f,%f)\n", pos_x,pos_y);
-    // printf("\t- Original pos:  (%f,%f)\n", getBody()->GetPosition().x,getBody()->GetPosition().y);
-
-    double dist_x=(neigh_pos_x-pos_x);
-    double dist_y=(neigh_pos_y-pos_y);
-    double dist=sqrt(dist_x*dist_x+dist_y*dist_y);
-    if (dist-radius-neigh_radius<0) return t;
-  }
-  return -1;
+  // printf("\t\t-New vel mag is:  %f\n", new_vel_mag);
 }
 
 bool NormalAgent::oncomingUpdate(double other_targ_relative_pos_x, double other_targ_relative_pos_y, double dist, double other_radius, int time_collision)
@@ -253,26 +211,3 @@ double NormalAgent::newAngleWorldFrame(double other_pos_x, double other_pos_y, d
 
   return new_goal_theta;
 }
-
-  // Check for general problems; is there a ship infront of us (just slow down for now?)
-  // else if (neigh_ego_relative_pos_x>-neigh_radius && dist<cmf_dist)
-  // {
-  //   // double temp_vel_mag=vel_max*((dist-cmf_dist)/(range-radius-neigh_radius));
-  //   // temp_vel_mag=std::max(temp_vel_mag, 0.0);
-  //   // if (temp_vel_mag<new_vel_mag) new_vel_mag=temp_vel_mag;
-  //   // double force=(cmf_dist/dist);
-  //   double pf_pos_x=(pos_x-neigh_pos_x);
-  //   double pf_pos_y=(pos_y-neigh_pos_y);
-
-  //   double new_theta=atan2(pf_pos_y, pf_pos_x);
-  //   double temp_theta_acc=heading-new_theta;
-  //   if (abs(temp_theta_acc)>abs(new_theta_acc)) new_theta_acc=temp_theta_acc;
-
-  // }
-  // else
-  // {
-  //   double temp_vel_mag=vel_max*((dist-cmf_dist)/(range-radius-neigh_radius));
-  //   temp_vel_mag=std::max(temp_vel_mag, 0.0);
-  //   if (temp_vel_mag<new_vel_mag) new_vel_mag=temp_vel_mag;
-  // }
- // Distance from forbidden zones 

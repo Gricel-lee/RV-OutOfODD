@@ -12,9 +12,10 @@ size:
   max: 1.0
   min: 1.0
 vel-size ratio: 
-  linear: 5.0
+  linear: 2.0
   angular: 1.0
 range-size ratio: 30.0
+
 goal pose:
   x:
     target: 0.0
@@ -27,18 +28,19 @@ potential field weights:
     type: 0
     weight:
     bins:
-      - 10
+      - 5
   agent 1:
     type: 1
     weight:
     bins:
-      - 10
+      - 5
   goal:
     weight:
-distance zones:
-  - 15.0
-  - 30.0
+TTC bins:
+  - 50
+  - 150
+TTC violation: 20
 results directory:
 agent type: -1
 collision threshold: 0.1
-# situation transitions: 
+look ahead time: 600

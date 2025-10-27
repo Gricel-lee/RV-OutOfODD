@@ -10,11 +10,11 @@ import config.config as config
 """
 Generate a PRISM model file from an augmented situation coverage grid (CSV/XLSX) file.
 """
-def run_save():
+def run_save(output_folder="t0"):
     # ---- ANALYSE ------------------------
     print(f"[main] --- MAPE-K Analysis stage ---")
     # Create problem from data in CSV
-    output_folder="t0"
+    # output_folder="t0"
     csv_file = config.CSV_PATH
     problem_t0 = problem.SAVEProblem(output_folder=output_folder, csv_path=csv_file)
     print(f"[main] Problem created from CSV: {csv_file}")

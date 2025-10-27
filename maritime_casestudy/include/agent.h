@@ -73,6 +73,8 @@ class agent
 
     string parseYAMLENV(string yaml_line);
 
+    int checkFuture(int lookahead_time, double neigh_pos_x, double neigh_pos_y, double neigh_vel_mag, double neigh_theta, double neigh_radius);
+
     // Neighbour information
     int no_neigh=0;
     double sum_neigh_dist=0.0;
