@@ -1,0 +1,28 @@
+dtmc
+
+const int f1=-1;  // TTC
+const int f2=0; // Collision/near miss
+const int s1 = 1; 
+const int s2 = 2; 
+const int s3 = 3; 
+const int s4 = 4; 
+const int s5 = 5; 
+
+const int init_situation;
+
+module System
+  s : [-1..5] init init_situation;
+
+  // Situation: s3
+  [check_situation] s=s3 & t=0 ->  0.9999788277979348:(s'=f1) +  2.6992191084601047e-06:(s'=f2) +  4.097811516889582e-06:(s'=s1) +  3.1428867592837467e-06:(s'=s2) +  3.1721158722814365e-06:(s'=s3) +  4.2351470509587885e-06:(s'=s4) +  3.825021757437048e-06:(s'=s5);
+
+
+endmodule
+
+module Turn
+  // 0: checking situation
+  // 1: check number of situations spent at close distance
+  t : [0..1] init 0;
+  [check_situation] true -> 1:(t'=1);
+  [monitor_time] true -> 1:(t'=0);
+endmodule

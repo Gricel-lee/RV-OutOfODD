@@ -79,7 +79,7 @@ def run_save(output_folder="t0"):
     # ---- Execute ---------------------------
     if not problem_tN.verification_results['Violation'].any():
         print("[main] No violations found. No need to plan.")
-        return problem_t0
+        return problem_tN
         
     # Note: Check DeepDecs for ideas:
     # https://github.com/ccimrie/DeepDECS/blob/master/case_studies/mobile_robot_collision_limitation/DTMC_model_files/models/model_no_verif.pm

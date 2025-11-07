@@ -13,9 +13,9 @@ file_path=os.path.join(os.getenv("SIM_DIR_PATH"),"short_paper_results/transition
 avg_times_indvd={}
 avg_times_total={}
 
-trials=5
+trials=20
 
-for i in np.arange(5,21,5):
+for i in np.arange(5,51,5):
   print(f"Analysing situation length {i}")
   avg_times_indv_temp=[]
   avg_times_total_temp=[]

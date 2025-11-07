@@ -23,7 +23,7 @@ class SAVEProblem:
             output_folder_path="."
         else:
             output_folder=output_folder_path[-1]
-            output_folder_path_str="/".join(output_folder_path[:-1])
+        output_folder_path_str="/".join(output_folder_path[:-1])
         self.output_folder = aux.create_folder(str(Path(output_folder_path_str)), "output_"+output_folder)
         self.dtmc_file = f"{self.output_folder}/dtmc.prism"
         # vars
