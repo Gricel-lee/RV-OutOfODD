@@ -16,9 +16,9 @@ def strKey(key):
   str_key="["+",".join(key)+"]"
   return str_key
 
-def createProblemInstance(transition_csv_file, unsafe_config=[]):
+def createProblemInstance(transition_csv_file, unsafe_config=[], include_zero=True):
   transition_matrix=readTransitionMatrix(transition_csv_file, unsafe_config)
-  saveTransitionProbs(transition_matrix)
+  saveTransitionProbs(transition_matrix, include_zero=include_zero)
   casestudy_dir=os.getenv("SIM_DIR_PATH")
   output_folder=f"{casestudy_dir}/build/data/save_output"
   csv_file = config.CSV_PATH
@@ -43,17 +43,19 @@ def readTransitionMatrix(transition_csv_file, unsafe_config=[]):
   return transition_matrix
 
 
-def saveTransitionProbs(transition_matrix):
+def saveTransitionProbs(transition_matrix, include_zero=True):
   sim_dir_path=os.getenv("SIM_DIR_PATH")
   f=open(f"{sim_dir_path}/save_setup/input/coverageGrid.csv",'w')
   first_row=f"Situation,Next,Probability\n"
   f.write(first_row)
   for i in np.arange(2,len(transition_matrix)):
-    for j in np.arange(len(transition_matrix)):
-      p=transition_matrix[i][j]
-      next_state=f"s{j-1}" if j>1 else f"f{j+1}"
-      line=f"s{i-1},{next_state},{p}\n"
-      f.write(line)
+    if np.sum(transition_matrix[i])>0:
+      for j in np.arange(len(transition_matrix)):
+        p=transition_matrix[i][j]
+        if include_zero or p>0 or j<2:
+          next_state=f"s{j-1}" if j>1 else f"f{j+1}"
+          line=f"s{i-1},{next_state},{p}\n"
+          f.write(line)
   f.close()
   return
 
@@ -163,7 +165,9 @@ def checkCombos(stdscr, transition_csv_file, situations, weights, viable_control
 def createViableControllersCSV(problem_t0, casestudy_dir):
   situations=[s.name for s in problem_t0.situations.values()]
   N=len(situations)
+  print(f"Creating combos of {len(situations)} situations...")
   res=[list(comb) for i in range(1, N+1) for comb in combinations(situations, i)]
+  print(f"Total combos: {len(res)}")
   combo_dict={"[]" : [[]]}
   for r in res:
     combo_dict[strKey(r)]=[[]]
@@ -176,21 +180,26 @@ def testFunc(transition_csv_file):
   casestudy_dir=os.getenv("SIM_DIR_PATH")
   weights=((transition_csv_file.split('/')[-1]).split('.csv')[0]).split('_')
 
+  print("Performing checks...")
+
   ''' For pre-deployment '''
   if True:
     # Create problem from data in CSV
     viable_controllers_filename=f"{casestudy_dir}/build/data/viable_controllers/viable_controllers.csv"
     problem_t0=createProblemInstance(transition_csv_file)
+    print("Created problem instance")
     if not (os.path.exists(viable_controllers_filename)):
       Path(f"{casestudy_dir}/build/data/viable_controllers").mkdir(parents=True, exist_ok=True)
       viable_controllers=createViableControllersCSV(problem_t0,casestudy_dir)
+      print("Created viable controllers CSV file")
     else:
       viable_controllers=pd.read_csv(viable_controllers_filename, index_col=0)
 
     # # Print and save dtmcs
     # if config.SAVE_DTMC_FILES:
-    #     problem_t0.save_dtmc_file()
-    viable_controllers=wrapper(checkCombos, transition_csv_file, problem_t0.situations, weights, viable_controllers)
+    problem_t0_small=createProblemInstance(transition_csv_file, include_zero=False)
+    problem_t0_small.save_dtmc_file()
+    viable_controllers=wrapper(checkCombos, transition_csv_file, problem_t0_small.situations, weights, viable_controllers)
     viable_controllers.to_csv(path_or_buf=f"{casestudy_dir}/build/data/viable_controllers/viable_controllers.csv")
 
   ''' For deployment stage '''

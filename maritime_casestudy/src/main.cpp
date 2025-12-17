@@ -45,6 +45,7 @@ void clearScreenANSI() {
     std::cout << "\033[2J\033[1;1H";
 }
 
+
 b2ShapeId defineBody(b2BodyId particle_id, double radius, double density, double friction)
 {
   // Define circle-mass for our dynamic body.
@@ -178,6 +179,7 @@ void resetSim(agent* ego, b2WorldId worldID, vector<vector<double>> goal_locatio
   // b2Body_SetTransform(ego->getBodyID(),position,heading); 
 }
 
+
 vector<vector<double>> createGoalLocations(YAML::Node goal_config)
 {
   vector<vector<double>> goal_locations;
@@ -194,6 +196,7 @@ vector<vector<double>> createGoalLocations(YAML::Node goal_config)
   return goal_locations;
 }
 
+
 void sim(int TT, vector<NormalAgent*> colregs, vector<MassAgent*> MASS, vector<vector<double>> goal_locations, b2WorldId worldID)
 {
   // Define simulation parameters
@@ -208,13 +211,6 @@ void sim(int TT, vector<NormalAgent*> colregs, vector<MassAgent*> MASS, vector<v
       - lower->performance
   */
   int subStepCount=4;
-
-  // std::vector<int> neighbours;
-  // std::vector<b2BodyId*> agent_bodies_temp;
-  // std::vector<int> neigh_ind;
-
-  // int overall_counter=0;
-
   int cmd_line_len=0;
 
  // Run simulation 
@@ -229,12 +225,12 @@ void sim(int TT, vector<NormalAgent*> colregs, vector<MassAgent*> MASS, vector<v
       cout << progress.data();
     }
     
-    // For each mass 
-    // 1. Check distance
+    // For each vessel
+    // 1. Check goal and neighbour distance
     // 2. Update velocity
     // 3. Record New position
 
-   // Calculate new velocity commands
+   /* Calculate new velocity commands */
     // printf("\t-Calculating for colregs...\n");
     vector<NormalAgent*>::iterator it_ego=colregs.begin();
     for(it_ego; it_ego!=colregs.end(); ++it_ego)
@@ -271,8 +267,8 @@ void sim(int TT, vector<NormalAgent*> colregs, vector<MassAgent*> MASS, vector<v
       (*it_mass)->setPrevSituation();
     }
 
-    // Update the robot's heading
-    // Update robot's velocity
+    // Update vessel's heading
+    // Update vessel's velocity
 
     // printf("\t-Updating MASS...\n");
     for (vector<MassAgent*>::iterator it_mass=MASS.begin(); it_mass!=MASS.end(); ++it_mass)
@@ -287,7 +283,8 @@ void sim(int TT, vector<NormalAgent*> colregs, vector<MassAgent*> MASS, vector<v
     }
 
     // printf("\t-Updating colregs...\n");
-   // Update with new velocity commands
+   
+   /* Update with new velocity commands */
     it_ego=colregs.begin();
     for(it_ego; it_ego!=colregs.end(); ++it_ego)
     {
@@ -318,7 +315,10 @@ void sim(int TT, vector<NormalAgent*> colregs, vector<MassAgent*> MASS, vector<v
       (*it_ego)->agentNeighReset();
     }
 
-    bool collision=false;
+   /* Check situation transition for MASS */ 
+    bool fail_reset=false;
+    bool fail_ttc=false;
+    bool fail_collision=false;
 
     // printf("\t-Recording MASS step...\n");
     for (vector<MassAgent*>::iterator it_mass=MASS.begin(); it_mass!=MASS.end(); ++it_mass) 
@@ -333,10 +333,13 @@ void sim(int TT, vector<NormalAgent*> colregs, vector<MassAgent*> MASS, vector<v
         for (it_neigh; it_neigh!=colregs.end(); ++it_neigh) 
         {
           // printf("\t\t-Updating situation...\n");
-          collision_temp=updateMassSituation(*it_mass, *it_neigh);
+          // collision_temp=updateMassSituation(*it_mass, *it_neigh);
+          updateMassSituation(*it_mass, *it_neigh);
           // printf("\t\t-Situation updated!\n\n");    
           // printf("\t\t-Collided?  %i\n", collision_temp);
-          if (collision_temp || (*it_mass)->getShortestTTC()<0) collision=true;
+          // if (collision_temp) fail_collision=true;
+          if ((*it_mass)->getShortestTTC()==-1) fail_ttc=true, fail_reset=true;
+          else if ((*it_mass)->getShortestTTC()==-2) fail_collision=true, fail_reset=true;
         }
         vector<MassAgent*>::iterator it_mass_neigh=MASS.begin();
         for (it_mass_neigh; it_mass_neigh!=MASS.end(); ++it_mass_neigh)
@@ -344,27 +347,39 @@ void sim(int TT, vector<NormalAgent*> colregs, vector<MassAgent*> MASS, vector<v
           if(it_mass!=it_mass_neigh)
           {
             // printf("\t\t-Updating MASS situation...\n");
-            collision_temp=updateMassSituation(*it_mass, *it_mass_neigh);
-            if (collision_temp || (*it_mass)->getShortestTTC()<0) collision=true;
+            // collision_temp=updateMassSituation(*it_mass, *it_mass_neigh);
+            updateMassSituation(*it_mass, *it_mass_neigh);
+            // if (collision_temp || (*it_mass)->getShortestTTC()<0) fail_reset=true;
+            if ((*it_mass)->getShortestTTC()==-1) fail_ttc=true, fail_reset=true;
+            else if ((*it_mass)->getShortestTTC()==-2) fail_collision=true, fail_reset=true;
           }
         }    
       }
+      // printf("\t\t-Updating transition matrix...\n");
       (*it_mass)->updateTransitionMatrix();
+      // printf("\t\t-Update complete!\n");
 
       // if (collision_temp) collision=true;
       // printf("\t\t-Recording step...\n");
       // (*it_mass)->recordStep(t);  
       // printf("\t\t-Resetting neigh...\n");
       // printf("\t\t-reseting neighbours...\n");
+      // printf("\t\t-Resetting neighbour count...\n");
       (*it_mass)->agentNeighReset();
+      // printf("\t\t-Reset complete!\n");
       // printf("\t\t-Resetting situation...\n");
-      // printf("\t\t-reseting situation...\n");  
+      // printf("\t\t-reseting situation...\n");
+      // printf("\t\t-Resetting situation...\n");  
       (*it_mass)->resetSituation();
+      // printf("\t\t-Reset complete!\n");
       // printf("\t\t-Situation reset!\n");  
     }
-    if (collision==true)
+    if (fail_reset)
     {
-      printf("Reseting sim due to collision at time %i\n", t);
+      int fail_cond;
+      if (fail_ttc) fail_cond=1;
+      else if (fail_collision) fail_cond=2;
+      printf("Reseting sim due to failure (f%i) at time %i\n", fail_cond, t);
       for (int i=0; i<colregs.size(); ++i)
       {
         // printf("\nResetting for vessel %i\n", i);
@@ -382,9 +397,11 @@ void sim(int TT, vector<NormalAgent*> colregs, vector<MassAgent*> MASS, vector<v
         for (auto mass : MASS) resetSim(mass, worldID, goal_locations);
       }
     }
+    // printf("\t-Episode simulation complete!\n");
   }
   return;
 }
+
 
 vector<NormalAgent*> createCOLREGAgents(YAML::Node config, vector<vector<double>> goal_locations, b2WorldId worldID)
 {
@@ -483,7 +500,7 @@ int main(int argc, const char* argv[])
     for (int e=0; e<EE; ++e)
     {
      clearScreenANSI();
-     printf("Performing episode  %i of %i\n", e, EE);
+     printf("Performing episode  %i of %i\n", e+1, EE);
      // Set up simulated world/environment
       // Define the gravity vector.
       b2Vec2 gravity={0.0f, 0.0f};

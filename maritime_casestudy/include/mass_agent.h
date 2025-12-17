@@ -4,6 +4,17 @@
 #include <csv_functions.h>
 #include<algorithm>
 
+struct neighLocation{
+  float dist;
+  float bearing;
+  float x;
+  float y;
+  float vel;
+  float heading;
+  float radius;
+  int type;
+};
+
 class MassAgent : public agent
 {
   public:
@@ -37,12 +48,14 @@ class MassAgent : public agent
             vector<int> neighbour_bins=potential_field_weights[key]["bins"].as<vector<int>>();
 
             int bin_count=0;
+            map<int,int> temp_neigh_bins;
             for(vector<int>::iterator it_bin=neighbour_bins.begin(); it_bin!=neighbour_bins.end(); it_bin++)
             {
-              vector<int> key={type, *it_bin};
-              neigh_count_bins[key]=bin_count;
+              // vector<int> key={type, *it_bin};
+              temp_neigh_bins[*it_bin]=bin_count;
               ++bin_count;
             }
+            neigh_count_bins[type]=temp_neigh_bins;
             situation_neigh_comp[type]={bin_count+1};
           }
         }
@@ -66,11 +79,15 @@ class MassAgent : public agent
       }
       shortest_ttc_bin=TTC.size();
 
-      int mult_const=TTC.size();
+      int mult_const=TTC.size()+1;
+      printf("\t\t-TTC size:  %i\n", mult_const);
+      
       for (auto const& [key, val] : situation_neigh_comp)
       {
         situation_neigh_comp[key].push_back(mult_const);
         mult_const*=(val[0]); // By end of loop mult_const is also total number of states
+
+        printf("\t\t-Current mult const:  %i\n", mult_const);
 
         std::stringstream stream;
         stream << std::fixed << std::setprecision(1) << pf_weights[key];
@@ -81,7 +98,8 @@ class MassAgent : public agent
       stream << std::fixed << std::setprecision(1) << goal_weight;
       std::string s=stream.str();
       transition_filename+=(s+".csv");
-      total_situations=mult_const-(TTC.size()-1)+2; // Remove TTC combos when no visible neighbours; add 2 for fail states
+      total_situations=mult_const-(TTC.size())+2; // Remove TTC combos when no visible neighbours; add 2 for fail states
+      printf("\t\t-Total situations:  %i\n", total_situations);
      // Set up transitions output file (if it does not exist); otherwise load current transition count
       // printf("\t - Does file [%s] exist:  %i\n", (results_dir+"/"+transition_filename).data(), filesystem::exists(results_dir+"/"+transition_filename));
       if(!filesystem::exists(results_dir+"/"+transition_filename))
@@ -139,6 +157,7 @@ class MassAgent : public agent
       }
       mass_lookahead_time=config["look ahead time"].as<int>();
     };
+
     void updateVel();
     void updateNeighPF(agent* neighbour);
     double getGoalDist(double pos_x, double pos_y);
@@ -153,9 +172,12 @@ class MassAgent : public agent
     float getCollisionThresh();
     int getTTCThresh();
     int getShortestTTC();
+    struct neighLocation getNeighLocation(agent* neighbour);
 
 
   private:
+    int temp_ttc; 
+
     double goal_weight;
     // double neigh_weight;
     double pf_x_neigh=0.0;
@@ -166,7 +188,7 @@ class MassAgent : public agent
 
    // Situtation description
     map<int, int> neighbour_types; // To keep track of number of neighbours w.r.t. agent type
-    map<vector<int>, int> neigh_count_bins; // <type, number> -> bin
+    map<int, map<int,int>> neigh_count_bins; // type -> <number -> bin>
     map<int, vector<int>>  situation_neigh_comp; // <type, <bin count, multiplicative constant for calculating state>
     map<int, int> TTC; // TTC=time to collision; key is max time of bin
     int shortest_ttc_bin;

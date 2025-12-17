@@ -12,7 +12,7 @@ size:
   max: 1.0
   min: 1.0
 vel-size ratio: 
-  linear: 2.0
+  linear: 5.0
   angular: 1.0
 range-size ratio: 30.0
 
@@ -28,17 +28,18 @@ potential field weights:
     type: 0
     weight:
     bins:
-      - 5
+      - 1
+      - 4
   agent 1:
     type: 1
     weight:
     bins:
-      - 5
+      - 1
+      - 4
   goal:
     weight:
 TTC bins:
-  - 50
-  - 150
+  - 100
 TTC violation: 20
 results directory:
 agent type: -1

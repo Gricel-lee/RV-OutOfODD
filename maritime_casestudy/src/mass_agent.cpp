@@ -10,6 +10,7 @@
 
 using namespace boost::python;
 
+
 MassAgent::MassAgent()
 {
   // EMPTY CONSTRUCTOR
@@ -58,9 +59,10 @@ void MassAgent::updateVel()
   - Agent type 0 neighbour count (then binned)
   ...
   - Agent type N neighbour count (then binned)
-  - Distance of closest neighbour (then binned)
+  - Shortest time to collision (TTC) (then binned)
 */
-void MassAgent::updateSituation(agent* neighbour)
+
+neighLocation MassAgent::getNeighLocation(agent* neighbour)
 {
  // Extract useful information from self/ego
   b2Vec2 position=b2Body_GetPosition(getBodyID());
@@ -79,31 +81,40 @@ void MassAgent::updateSituation(agent* neighbour)
   double o_theta=atan2(dist_y, dist_x);
   dist-=(radius+other_radius);
 
-  float neigh_vel_mag=neighbour->getVelMag();
-  float neigh_theta=neighbour->getTheta();
-  float neigh_radius=neighbour->getRadius();
+  neighLocation neigh_loc;
+  neigh_loc.dist=dist;
+  neigh_loc.bearing=o_theta;
+  neigh_loc.type=neighbour->getAgentType();
+  neigh_loc.x=other_pos_x;
+  neigh_loc.y=other_pos_y;
+  neigh_loc.heading=neighbour->getTheta();
+  neigh_loc.radius=neighbour->getRadius();
+  neigh_loc.vel=neighbour->getVelMag();
 
-  int neighbour_type=neighbour->getAgentType();
+  return neigh_loc;
+}
+
+void MassAgent::updateSituation(agent* neighbour)
+{
+  neighLocation neigh_loc=getNeighLocation(neighbour);
 
  // Update situation info
-  neighbour_types[neighbour_type]+=1;
-  // Go through (sorted) distance zones keys, and find ID
-    // Note: should be sorted by default
-  
-  if (dist<collision_thresh)
+  neighbour_types[neigh_loc.type]+=1;
+
+  if (neigh_loc.dist<collision_thresh)
   {
     shortest_ttc_bin=-2;
-    // printf("COLLISION\n");
     return;
   }
 
-  int ttc=checkFuture(mass_lookahead_time, other_pos_x, other_pos_y, neigh_vel_mag, neigh_theta, neigh_radius);
+  // int ttc=checkFuture(mass_lookahead_time, other_pos_x, other_pos_y, neigh_vel_mag, neigh_theta, neigh_radius);
+  int ttc=checkFuture(mass_lookahead_time, neigh_loc.x, neigh_loc.y, neigh_loc.vel, neigh_loc.heading, neigh_loc.radius);
   // printf("\t\t-Future checked!\n");
   if (ttc<0) ttc=mass_lookahead_time+1;
   if (ttc<ttc_violation) shortest_ttc_bin=-1;
   else
   { 
-    int temp_ttc_bin=0;
+    int temp_ttc_bin=size(TTC);
     for (std::map<int, int>::iterator it=TTC.begin(); it!=TTC.end(); it++)
     {
       if (ttc<it->first) temp_ttc_bin=it->second;
@@ -111,6 +122,7 @@ void MassAgent::updateSituation(agent* neighbour)
     if (temp_ttc_bin<shortest_ttc_bin) shortest_ttc_bin=temp_ttc_bin;
   }
 
+  if (ttc<temp_ttc) temp_ttc=ttc;
   return;
 }
 
@@ -120,15 +132,42 @@ int MassAgent::situationID()
   else if (shortest_ttc_bin==-2) return 1; // Collision violation
 
   int situation_id=0;
-  vector<int> vec_situation;
+
+  string check_log="";
+
+  check_log+="\t-Breakdown of situation:\n";
+  check_log+="\t\t-TTC and bin:  "+to_string(temp_ttc)+"  "+to_string(shortest_ttc_bin)+"\n";
+  check_log+="\t\t-Agent A neighbour count:  "+to_string(neighbour_types[0])+"\n";
+  check_log+="\t\t-Agent B neighbour count:  "+to_string(neighbour_types[1])+"\n";
+  
+  bool neigh_present=false;
+
   for (auto const& [key, val] : neighbour_types)
   {
+    int neigh_bin=neigh_count_bins[key].size();
+    for (auto const& [num, bin] : neigh_count_bins[key])
+    {
+      if (val<num && bin<neigh_bin) neigh_bin=bin;
+    }
     int max_val=situation_neigh_comp[key][0]*situation_neigh_comp[key][1];
-    situation_id+=(min(max_val,situation_neigh_comp[key][1]*val));
+    check_log+="\t\t\t-Neighbouring bin for type "+to_string(key)+":  "+to_string(neigh_bin)+"\n";
+    situation_id+=(min(max_val,situation_neigh_comp[key][1]*neigh_bin));
+    if (val>0) neigh_present=true;
   }
-  situation_id+=(shortest_ttc_bin+2); // Add for fail states
+  check_log+="\t\t-Situation ID neighbours:  "+to_string(situation_id)+"\n";
+  situation_id+=2; // Add for fail states
+  if (neigh_present) situation_id+=shortest_ttc_bin;
+  
+  // printf("%i  ", situation_id);
   int offset=TTC.size();
-  situation_id=max(1, situation_id-offset);
+  // int offset=0;
+  // printf("%i\n", situation_id-offset);
+  check_log+="\t\t-Situation ID TTC:  "+to_string(situation_id)+"\n";
+  
+  // if (neigh_present) printf("%s", check_log.data()), cin.get();
+
+  situation_id=max(2, situation_id-offset);
+  // temp_ttc=mass_lookahead_time;
   return situation_id;
 }
 
@@ -139,56 +178,15 @@ void MassAgent::setPrevSituation()
 
 void MassAgent::updateNeighPF(agent* neighbour)
 {
- // Extract useful information from self/ego
-  b2Vec2 position=b2Body_GetPosition(getBodyID());
-  double pos_x=position.x;
-  double pos_y=position.y;
-
- // Extract useful information from neighbour
-  b2Vec2 neigh_position=b2Body_GetPosition(neighbour->getBodyID());
-  double other_pos_x=neigh_position.x;
-  double other_pos_y=neigh_position.y;
-
-  double other_radius=neighbour->getRadius();
-  double dist_x=other_pos_x-pos_x;
-  double dist_y=other_pos_y-pos_y;
-  double dist=sqrt(dist_x*dist_x+dist_y*dist_y);
-  double o_theta=atan2(dist_y, dist_x);
-  dist-=(radius+other_radius);
-
-
-  float neigh_vel_mag=neighbour->getVelMag();
-  float neigh_theta=neighbour->getTheta();
-  float neigh_radius=neighbour->getRadius();
-
-  // printf("\t\t-Checking future...%i\n", mass_lookahead_time);
-
-  int neighbour_type=neighbour->getAgentType();
-
- // Update situation info
-  neighbour_types[neighbour_type]+=1;
-  // Go through (sorted) distance zones keys, and find ID
-    // Note: should be sorted by default
-  // printf("\t\t-Checking bins...\n");
-  int ttc=checkFuture(mass_lookahead_time, other_pos_x, other_pos_y, neigh_vel_mag, neigh_theta, neigh_radius);
-  // printf("\t\t-Future checked!\n");
-  if (ttc<0) ttc=mass_lookahead_time+1;
-  if (ttc<ttc_violation) shortest_ttc_bin=-1;
-  else
-  { 
-    int temp_ttc_bin=0;
-    for (std::map<int, int>::iterator it=TTC.begin(); it!=TTC.end(); it++)
-    {
-      if (ttc<it->first) temp_ttc_bin=it->second;
-    }
-    if (temp_ttc_bin<shortest_ttc_bin) shortest_ttc_bin=temp_ttc_bin;
-  }
-  // printf("\t\t-Bins checked!\n");
+ // Update situation
+  updateSituation(neighbour);
+ 
+  neighLocation neigh_loc=getNeighLocation(neighbour);
 
  // Apply PF with corresponding agent type weight
-  float neigh_weight=pf_weights[neighbour_type];
-  pf_x_neigh+=-neigh_weight*(range-dist)*cos(o_theta);
-  pf_y_neigh+=-neigh_weight*(range-dist)*sin(o_theta);
+  float neigh_weight=pf_weights[neigh_loc.type];
+  pf_x_neigh+=-neigh_weight*(range-neigh_loc.dist)*cos(neigh_loc.bearing);
+  pf_y_neigh+=-neigh_weight*(range-neigh_loc.dist)*sin(neigh_loc.bearing);
 }
 
 double MassAgent::getGoalDist(double pos_x, double pos_y)
@@ -201,6 +199,7 @@ double MassAgent::getGoalDist(double pos_x, double pos_y)
   return dist;
 }
 
+
 void MassAgent::resetSituation()
 {
   for (map<int,int>::iterator it=neighbour_types.begin(); it!=neighbour_types.end(); ++it)
@@ -208,22 +207,27 @@ void MassAgent::resetSituation()
     neighbour_types[it->first]=0;
   }
   shortest_ttc_bin=size(TTC);
+  temp_ttc=mass_lookahead_time;
 }
+
 
 float MassAgent::getCollisionThresh()
 {
   return collision_thresh;
 }
 
+
 int MassAgent::getTTCThresh()
 {
   return ttc_violation;
 }
 
+
 int MassAgent::getShortestTTC()
 {
   return shortest_ttc_bin;
 }
+
 
 void MassAgent::recordStep(int t)
 {
@@ -285,6 +289,7 @@ void MassAgent::recordStep(int t)
 void MassAgent::updateTransitionMatrix()
 {
   int next_state=situationID();
+  // printf("\t\t-Situation is:  %i\n", next_state);
   state_trans_count[prev_situation][next_state]+=1;
 }
 

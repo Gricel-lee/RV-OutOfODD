@@ -14,7 +14,7 @@
 #include <fstream>
 #include <random>
 #include <chrono>
-#include <armadillo>
+// #include <armadillo>
 #include <tuple>
 
 using namespace std;

@@ -12,7 +12,7 @@ size:
   max: 2.0
   min: 1.0
 vel-size ratio: 
-  linear: 2.0
+  linear: 5.0
   angular: 1.0
 range-size ratio: 30.0
 goal pose:

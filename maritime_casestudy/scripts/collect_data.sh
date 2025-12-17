@@ -13,6 +13,10 @@ do
   cd $SIM_DIR_PATH
 done
 
+cd $SIM_DIR_PATH/model_check
+python3 batch_model_check.py
+cd $SIM_DIR_PATH
+
 # python3 INTERPRET_AND_ASSIGN_CONTROLLER.py ## A collection of controllers and which combination of situations they are valid for  
 # cd ../
 
