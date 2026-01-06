@@ -1,3 +1,4 @@
 evaluation/transition_probs/*
 evaluation/times/*
 evaluation/save_output/*
+evaluation/py_scripts/results.txt

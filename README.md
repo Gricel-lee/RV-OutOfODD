@@ -1,24 +1,7 @@
 # RV-OutOfODD
 
+The repo is divided into two directories:
 
-## Run SAVE
+1. ```SAVE``` contains the code required for executing the process, and instructions for setup, including guidance for your own application. These can be found in ```SAVE/README.md```
 
-First, set up virtual environment with requirements in ```src/requirements.txt``` in venv.
-
-Second, to run SAVE do:
-
-1. Set paths in src/config.ini
-
-2. Run by activating the virtual environment, 
-```
-source venv/bin/activate && python --version
-cd src/
-python3 main.py
-```
-
-
-# Notes:
-
-- Situations name in the .csv file must start with "s".
-
-- Failures name in the .csv file must start with "f".
+2. ```evaluation``` contains scripts for generating usable data as described in the paper. This includes pre-deployment and deployment transition matrices, along with generating PRISM models and a plot for execution times. 
