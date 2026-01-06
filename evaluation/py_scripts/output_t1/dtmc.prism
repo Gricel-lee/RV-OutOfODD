@@ -1,0 +1,37 @@
+dtmc
+
+const int f1=-1;  // TTC
+const int f2=0; // Collision/near miss
+const int s1 = 1; 
+const int s2 = 2; 
+const int s3 = 3; 
+const int s4 = 4; 
+const int s5 = 5; 
+
+const int init_situation;
+
+module System
+  s : [-1..5] init init_situation;
+
+  // Situation: s1
+  [check_situation] s=s1 & t=0 ->  0.1036732975476265:(s'=f1) +  0.3379293407711469:(s'=f2) +  0.057923727326948:(s'=s1) +  0.2184331473879942:(s'=s2) +  0.0185594498824685:(s'=s3) +  0.0393642774444795:(s'=s4) +  0.2241167596393362:(s'=s5);
+
+  // Situation: s2
+  [check_situation] s=s2 & t=0 ->  0.2045062498341339:(s'=f1) +  0.1936785117167803:(s'=f2) +  0.1861680953265571:(s'=s1) +  0.0884530665322045:(s'=s2) +  0.0296701255274541:(s'=s3) +  0.2211459356174199:(s'=s4) +  0.0763780154454499:(s'=s5);
+
+  // Situation: s3
+  [check_situation] s=s3 & t=0 ->  0.9612079587369324:(s'=f1) +  0.0023236546050035:(s'=f2) +  0.0068619648197137:(s'=s1) +  0.0021140705719413:(s'=s2) +  0.0094303890983666:(s'=s3) +  0.008757909916856:(s'=s4) +  0.0093040522511862:(s'=s5);
+
+  // Situation: s5
+  [check_situation] s=s5 & t=0 ->  0.039977550403661:(s'=f1) +  0.0631179035530803:(s'=f2) +  0.4091438932780727:(s'=s1) +  0.0116565211760134:(s'=s2) +  0.1266675301126797:(s'=s3) +  0.0279324785217804:(s'=s4) +  0.3215041229547122:(s'=s5);
+
+
+endmodule
+
+module Turn
+  // 0: checking situation
+  // 1: check number of situations spent at close distance
+  t : [0..1] init 0;
+  [check_situation] true -> 1:(t'=1);
+  [monitor_time] true -> 1:(t'=0);
+endmodule

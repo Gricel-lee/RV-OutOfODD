@@ -17,7 +17,7 @@ failure_inc=1.5
 
 output=[]
 output_str="{0}  {1}  {2}  {3}\n"
-for i in np.arange(20):
+for i in np.arange(5,51,5):
   ## Load pre-deploy TM
   predeploy_TM=readTransitionMatrix(predeploy_file_path.format(i))
   nvc=False

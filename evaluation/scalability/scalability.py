@@ -6,6 +6,8 @@ import os
 from pathlib import Path
 import time
 import matplotlib.pyplot as plt
+import sys
+sys.path.append('../py_scripts')
 from save_utils import *
 
 save_eval_dir_env="SAVE_EVAL_PATH"
