@@ -1,5 +1,5 @@
-TT: 20000
-EE: 10
+TT: 100000
+EE: 1
 goal file: ${SIM_DIR_PATH}/yaml_files/setup/goal_locations.yaml
 agents:
   vessel a:

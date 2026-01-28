@@ -41,6 +41,7 @@ potential field weights:
 TTC bins:
   - 100
 TTC violation: 20
+goal time threshold: 5000.0
 results directory:
 agent type: -1
 collision threshold: 0.1

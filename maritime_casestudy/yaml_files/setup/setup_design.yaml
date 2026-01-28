@@ -1,18 +1,16 @@
-TT: 100000
-goal file: ${SEAMS_DIR_PATH}/yaml_files/setup/goal_locations.yaml
-# results directory: ../results/
+TT: 20000
+EE: 10
+goal file: ${SIM_DIR_PATH}/yaml_files/setup/goal_locations.yaml
 agents:
   vessel a:
     N: 10
-    yaml file: ${SEAMS_DIR_PATH}/yaml_files/agents/vessel_a_design.yaml
+    yaml file: ${SIM_DIR_PATH}/yaml_files/agents/vessel_a_design.yaml
   vessel b:
     N: 10
-    yaml file: ${SEAMS_DIR_PATH}/yaml_files/agents/vessel_b_design.yaml
+    yaml file: ${SIM_DIR_PATH}/yaml_files/agents/vessel_b_design.yaml
 mass agents:
   mass agent:
     N: 1
-    yaml file: ${SEAMS_DIR_PATH}/yaml_files/agents/mass_agent.yaml
-    goal field weight: 1.0
-    neighbour field weight: 0.1
+    yaml file:  ${SIM_DIR_PATH}/build/data/controller/0.50_0.10_1.60/mass_agent_0.50_0.10_1.60.yaml
     results file: mass_output.txt
 # design phase: true

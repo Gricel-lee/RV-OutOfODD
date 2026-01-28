@@ -1,0 +1,24 @@
+filter(state, P=? [ F<10 "fail" ], s=1)
+
+filter(state, P=? [ F<10 "fail" ], s=2)
+
+filter(state, P=? [ F<10 "fail" ], s=3)
+
+filter(state, P=? [ F<10 "fail" ], s=4)
+
+filter(state, P=? [ F<10 "fail" ], s=5)
+
+filter(state, P=? [ F<10 "fail" ], s=6)
+
+filter(state, P=? [ F<10 "fail" ], s=7)
+
+filter(state, P=? [ F<10 "fail" ], s=8)
+
+filter(state, P=? [ F<10 "fail" ], s=9)
+
+filter(state, P=? [ F<10 "fail" ], s=10)
+
+filter(state, P=? [ F<10 "fail" ], s=11)
+
+filter(state, P=? [ F<10 "fail" ], s=12)
+

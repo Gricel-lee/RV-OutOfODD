@@ -1,0 +1,64 @@
+Row,Situation,Passing door,Static Obstacle,Human Present,Robot Present,Next Situation,Probability,Description,Action
+1,s1,N,N,N,N,1,0.85,Continue as normal,Patrolling
+2,s1,N,N,N,N,2,0.05,A robot is detected,Patrolling
+3,s1,N,N,N,N,3,0.03,Human detected,Patrolling
+4,s1,N,N,N,N,9,0.06,Pass through door (sent to another room),Patrolling
+5,s1,N,N,N,N,0,0.01,Failed,Patrolling
+6,s2,N,N,N,Y,2,0.85,Continue as normal,Patrolling
+7,s2,N,N,N,Y,1,0.05,Robot not longer detected,Patrolling
+8,s2,N,N,N,Y,4,0.003,Human detected,Patrolling
+9,s2,N,N,N,Y,6,0.001,Static obstacle detected,Patrolling
+10,s2,N,N,N,Y,10,0.02,Pass through door (sent to another room),Patrolling
+11,s2,N,N,N,Y,0,0.076,Failed,Patrolling
+12,s3,N,N,Y,N,3,0.8,Continue as normal,Patrolling
+13,s3,N,N,Y,N,1,0.05,No dection,Patrolling
+14,s3,N,N,Y,N,4,0.03,Robot detected,Patrolling
+15,s3,N,N,Y,N,7,0.03,Static obstacle detected,Patrolling
+16,s3,N,N,Y,N,11,0.02,Pass through door (sent to another room),Patrolling
+17,s3,N,N,Y,N,0,0.07,Failed,Patrolling
+18,s4,N,N,Y,Y,4,0.83,Continue as normal,Patrolling
+19,s4,N,N,Y,Y,2,0.04,Human no longer detected,Patrolling
+20,s4,N,N,Y,Y,3,0.09,Robot is no longer detected,Patrolling
+21,s4,N,N,Y,Y,8,0.01,Static obstacle detected,Patrolling
+22,s4,N,N,Y,Y,12,0.02,Pass through door (sent to another room),Patrolling
+23,s4,N,N,Y,Y,0,0.01,failed,Patrolling
+24,s5,N,Y,N,N,5,0.8,Continue as normal,Patrolling
+25,s5,N,Y,N,N,1,0.01,Static obstacle no longer detected,Patrolling
+26,s5,N,Y,N,N,6,0.09,Robot detected,Patrolling
+27,s5,N,Y,N,N,7,0.07,Human detected,Patrolling
+28,s5,N,Y,N,N,0,0.03,failed,Patrolling
+29,s6,N,Y,N,Y,6,0.8,Continue as normal,Patrolling
+30,s6,N,Y,N,Y,2,0.06,Static obstacle no longer detected,Patrolling
+31,s6,N,Y,N,Y,5,0.04,Robot is no longer detected,Patrolling
+32,s6,N,Y,N,Y,8,0.03,Human detected,Patrolling
+33,s6,N,Y,N,Y,0,0.07,failed,Patrolling
+34,s7,N,Y,Y,N,7,0.82,Continue as normal,Patrolling
+35,s7,N,Y,Y,N,3,0.03,Static obstacle no longer detected,Patrolling
+36,s7,N,Y,Y,N,5,0.001,Human no longer detected,Patrolling
+37,s7,N,Y,Y,N,8,0.129,Robot detected,Patrolling
+38,s7,N,Y,Y,N,0,0.02,failed,Patrolling
+39,s8,N,Y,Y,Y,8,0.901,Continue as normal,Patrolling
+40,s8,N,Y,Y,Y,4,0.087,Static obstacle no longer detected,Patrolling
+41,s8,N,Y,Y,Y,6,0.001,Human no longer detected,Patrolling
+42,s8,N,Y,Y,Y,7,0.002,Robot is no longer detected,Patrolling
+43,s8,N,Y,Y,Y,0,0.009,failed,Patrolling
+44,s9,Y,N,N,N,9,0.569,Continue as normal,Patrolling
+45,s9,Y,N,N,N,1,0.292,Reach open space,Patrolling
+46,s9,Y,N,N,N,10,0.045,Robot detected,Patrolling
+47,s9,Y,N,N,N,11,0.06,Human detected,Patrolling
+48,s9,Y,N,N,N,0,0.034,failed,Patrolling
+49,s10,Y,N,N,Y,10,0.75,Continue as normal,Patrolling
+50,s10,Y,N,N,Y,2,0.204,Reach open space,Patrolling
+51,s10,Y,N,N,Y,9,0.003,Robot is no longer detected,Patrolling
+52,s10,Y,N,N,Y,12,0.01,Human is detected,Patrolling
+53,s10,Y,N,N,Y,0,0.033,failed,Patrolling
+54,s11,Y,N,Y,N,11,0.68,Continue as normal,Patrolling
+55,s11,Y,N,Y,N,3,0.3,Reach open space,Patrolling
+56,s11,Y,N,Y,N,9,0.01,Human no longer detected,Patrolling
+57,s11,Y,N,Y,N,12,0.001,Robot detected,Patrolling
+58,s11,Y,N,Y,N,0,0.009,failed,Patrolling
+59,s12,Y,N,Y,Y,12,0.5,Continue as normal,Patrolling
+60,s12,Y,N,Y,Y,4,0.4,Reach open space,Patrolling
+61,s12,Y,N,Y,Y,10,0.01,Human no longer detected,Patrolling
+62,s12,Y,N,Y,Y,11,0.088,Robot is no longer detected,Patrolling
+63,s12,Y,N,Y,Y,0,0.002,failed,Patrolling

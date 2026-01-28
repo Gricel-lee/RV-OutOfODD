@@ -1,0 +1,34 @@
+dtmc
+
+const int f1=-1;  // TTC
+const int f2=0; // Collision/near miss
+const int s1 = 1; 
+const int s2 = 2; 
+const int s3 = 3; 
+const int s4 = 4; 
+const int s5 = 5; 
+
+const int init_situation;
+
+module System
+  s : [-1..5] init init_situation;
+
+  // Situation: s1
+  [check_situation] s=s1 & t=0 ->  0.0075856374168045:(s'=f1) +  0.9554048196353532:(s'=f2) +  0.0117397940060462:(s'=s1) +  0.0013070209060621:(s'=s2) +  0.0094900567240292:(s'=s3) +  0.0144709760835516:(s'=s4) +  1.695228153128603e-06:(s'=s5);
+
+  // Situation: s2
+  [check_situation] s=s2 & t=0 ->  0.9591081454549458:(s'=f1) +  0.0092699291524458:(s'=f2) +  0.0071390841423001:(s'=s1) +  0.0128518581727641:(s'=s2) +  0.0082602841377799:(s'=s3) +  0.001532504658507:(s'=s4) +  0.001838194281257:(s'=s5);
+
+  // Situation: s3
+  [check_situation] s=s3 & t=0 ->  0.2909131172953421:(s'=f1) +  0.1409906252306783:(s'=f2) +  0.0978814497674761:(s'=s1) +  0.1014984867498339:(s'=s2) +  0.1949509116409537:(s'=s3) +  0.1644644570753672:(s'=s4) +  0.0093009522403484:(s'=s5);
+
+
+endmodule
+
+module Turn
+  // 0: checking situation
+  // 1: check number of situations spent at close distance
+  t : [0..1] init 0;
+  [check_situation] true -> 1:(t'=1);
+  [monitor_time] true -> 1:(t'=0);
+endmodule

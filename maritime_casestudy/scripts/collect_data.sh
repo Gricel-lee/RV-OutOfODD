@@ -1,5 +1,5 @@
 export PYTHONPATH=":$SIM_DIR_PATH/model_check/:$SAVE_DIR_PATH/src/:"
-for i in $(seq 1 10);
+for i in $(seq 1 1);
 do
   # PRE-DEPLOYMENT PHASE
   cd $SIM_DIR_PATH/data_collection/generate_yaml
@@ -13,9 +13,9 @@ do
   cd $SIM_DIR_PATH
 done
 
-cd $SIM_DIR_PATH/model_check
-python3 batch_model_check.py
-cd $SIM_DIR_PATH
+# cd $SIM_DIR_PATH/model_check
+# python3 batch_model_check.py
+# cd $SIM_DIR_PATH
 
 # python3 INTERPRET_AND_ASSIGN_CONTROLLER.py ## A collection of controllers and which combination of situations they are valid for  
 # cd ../

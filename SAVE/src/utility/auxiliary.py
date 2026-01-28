@@ -59,21 +59,22 @@ def check_file_extension(fpath):
 def get_dtmc_model(problem_instance, ignore_states: List[str]=[]) -> str:
     '''Generates the DTMC model for the given problem instance.
     If ignore_states is given, transitions from those states will be removed.'''
-    # get all situations and failures from the problem
+    # get all situations, failures, and goals from the problem
     all_situations_n_failures = problem_instance.states[2:]
 
+# const int fg=-2; // Too long to travel between goals
     s="""dtmc
-
-const int f1=-1;  // TTC
-const int f2=0; // Collision/near miss
+const int f1=-1; // TTC
+const int f2=0;  // Collision/near miss
 """
     # s+= 'dtmc\n\nconst int '
 
     for i_state, situation in enumerate(all_situations_n_failures):
         s+= f'const int {situation} = {i_state+1}; \n'
+    # s+=f'const int sg={len(all_situations_n_failures)+1};\n'
     s+= f'\nconst int init_situation;\n'
     s+= '\nmodule System\n'
-    s+= f'  s : [-1..{len(all_situations_n_failures)}] init init_situation;\n\n'
+    s+= f'  s : [-2..{len(all_situations_n_failures)}] init init_situation;\n\n'
     for i in sorted(problem_instance.situations.keys()):
         p_sum=np.sum([p for next_situation, p in problem_instance.situations[i].transitions])
         # p_sum=np.sum(problem_instance.situations[i].transitions[:,1])
@@ -83,13 +84,32 @@ const int f2=0; // Collision/near miss
             for next_situation, prob in problem_instance.situations[i].transitions:
                 s+= f' {prob}:(s\'={next_situation}) + '
             s = s.rstrip(' + ') + ';\n\n'
-#     s+= 'endmodule\n'
+    s+= 'endmodule\n'
 #     lines="""
-# const int time_MAX;
-
-# module ttcFail
-#   time_close : [0..time_MAX] init 0;
+# const int MAX_TIME;
 # """
+
+# lines+=f"const float g_success;\n"
+
+# lines+="""
+# module goalReached
+#    travel_time : [0..MAX_TIME] init 0;
+
+#    [check_goal] t=1 & travel_time<MAX_TIME -> g_success:(travel_time'=0) + (1-g_success):(travel_time'=travel_time+1);
+#    [check_travel_time] travel_time=MAX_TIME -> s=fg;
+
+# endmodule
+
+lines="""
+module Turn
+  // 0: checking situation
+  // 1: check if reached goal
+  t : [0..2] init 0;
+  [check_situation] t=0 -> 1:(t'=1);
+  [check_goal] t=1 -> 1:(t'=2);
+  [check_travel_time] t=2 -> 1:(t'=0);
+endmodule
+"""
     # close_states=[]
     # for i in sorted(problem_instance.situations.keys()):
     #     check_close_mod=(int(i[1:])-2)%problem_instance.close_state_mod==0
@@ -105,17 +125,7 @@ const int f2=0; // Collision/near miss
   #   lines=f"""
   # // Check TTC violation
   # [monitor_ttc] t=1 & {close_states_str} -> 1:(s'=f2);
-    lines=f"""
-endmodule
-
-module Turn
-  // 0: checking situation
-  // 1: check number of situations spent at close distance
-  t : [0..1] init 0;
-  [check_situation] true -> 1:(t'=1);
-  [monitor_time] true -> 1:(t'=0);
-endmodule
-"""  
+    # lines=f"""
     s+=lines
     return s
 

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 **/maritime_casestudy/build/
 **/maritime_casestudy/*.npz
 **/maritime_casestudy/*.txt
@@ -5,3 +6,9 @@
 **/maritime_casestudy/*.mp4
 **/maritime_casestudy/*.pickle
 **/maritime_casestudy/results_analysis/test_output/*.csv
+=======
+evaluation/transition_probs/*
+evaluation/times/*
+evaluation/save_output/*
+evaluation/py_scripts/results.txt
+>>>>>>> 2cb06d873ee7a8dc65b9c1585ebf488ee46e0209

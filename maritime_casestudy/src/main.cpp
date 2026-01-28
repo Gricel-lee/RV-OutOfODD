@@ -27,6 +27,7 @@ struct {
   uniform_int_distribution<std::mt19937::result_type> choice;
 } rng_setup;
 
+
 string parseYAMLENV(string yaml_line)
 {
   auto const env_regex=regex("\\$\\{.*\\}");
@@ -40,6 +41,7 @@ string parseYAMLENV(string yaml_line)
   std::regex_replace(std::back_inserter(parsed_line), yaml_line.begin(), yaml_line.end(), env_regex, env_val);
   return parsed_line;
 }
+
 
 void clearScreenANSI() {
     std::cout << "\033[2J\033[1;1H";
@@ -217,7 +219,14 @@ void sim(int TT, vector<NormalAgent*> colregs, vector<MassAgent*> MASS, vector<v
   for (int t=0; t<TT; ++t)
   {
     // printf("\t-Updating time...\n");
-    if (t%int(0.01*TT)==0)
+    if (TT*0.01<1)
+    {
+      cout << string(cmd_line_len,'\b') << flush;
+      string progress="\t-Time step: "+to_string(t)+"/"+to_string(TT)+"\t\t\t\r";
+      cmd_line_len=progress.length();
+      cout << progress.data();
+    }
+    else if (t%int(0.01*TT)==0)
     { 
       cout << string(cmd_line_len,'\b') << flush;
       string progress="\t-Time step: "+to_string(t)+"/"+to_string(TT)+"\t\t\t\r";
@@ -248,8 +257,26 @@ void sim(int TT, vector<NormalAgent*> colregs, vector<MassAgent*> MASS, vector<v
     for (vector<MassAgent*>::iterator it_mass=MASS.begin(); it_mass!=MASS.end(); ++it_mass)
     {
       // printf("\t\t-Checking goal...\n");
-      if ((*it_mass)->checkGoal()) setGoal(*it_mass, goal_locations, rng_setup.choice(rng_setup.dev));
+
+      b2Vec2 position=b2Body_GetPosition((*it_mass)->getBodyID());
+      double pos_x=position.x;
+      double pos_y=position.y;
+      // printf("Distance to goal:  %f\n", (*it_mass)->getGoalDist(pos_x, pos_y));
+      // if (t%1000==0)
+      // {
+      //   string dist_log="";
+      //   dist_log+="\t\t-Agent/Goal Positions:  ("+str(pos_x)+", "+str(pos_y)+")  ("+(*it_mass)+    "\n";
+      //   dist_log+="\t\t-Distance to goal:  "+str((*it_mass)->getGoalDist(pos_x, pos_y))+"\n";
+      // }
+
+       // printf("\t\t-Distance to goal:  %f\n", (*it_mass)->getGoalDist(pos_x, pos_y));
+
+      if ((*it_mass)->checkGoal())
+      {
+        (*it_mass)->recordGoalTime();
+        while ((*it_mass)->checkGoal()) setGoal(*it_mass, goal_locations, rng_setup.choice(rng_setup.dev));
       // printf("\t\t-Checked goal.\n");
+      }
 
       vector<NormalAgent*>::iterator it_neigh=colregs.begin();
       for (it_neigh; it_neigh!=colregs.end(); ++it_neigh) 
@@ -433,6 +460,7 @@ vector<NormalAgent*> createCOLREGAgents(YAML::Node config, vector<vector<double>
   }
   return colregs;
 }
+
 
 vector<MassAgent*> createMassAgents(YAML::Node config, vector<vector<double>> goal_locations, b2WorldId worldID)
 {

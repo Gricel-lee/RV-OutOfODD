@@ -1,0 +1,11 @@
+s1 , {vessel A: 0, vesselB: 0, closestDist : 0}
+s2 , {vessel A: 1 vesselB: 0 closestDist : "close"}
+s3 , {vessel A: 0 vesselB: 1 closestDist : "close"}
+s4 , {vessel A: 1 vesselB: 1 closestDist : "close"}
+s5 , {vessel A: 1 vesselB: 0 closestDist : "far"}
+s6 , {vessel A: 0 vesselB: 1 closestDist : "far"}
+s7 , {vessel A: 1 vesselB: 1 closestDist : "far"}
+f1 , {distance2ClosestVessel<2}
+f2 , {SOMETHING}
+
+

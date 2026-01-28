@@ -23,7 +23,7 @@ void MassAgent::updateVel()
   double pos_x=position.x;
   double pos_y=position.y;
   b2Rot rotation=b2Body_GetRotation(getBodyID());
-  double heading=b2Rot_GetAngle(rotation)*(M_PI/180.0);
+  double heading=b2Rot_GetAngle(rotation);//*(M_PI/180.0);
   double targ_theta=atan2(targ_y-pos_y, targ_x-pos_x);
   double goal_dist=getGoalDist(pos_x, pos_y);
   double pf_x_g=goal_weight*goal_dist*cos(targ_theta);
@@ -32,13 +32,13 @@ void MassAgent::updateVel()
  // Combine potential fields
   double pf_x=pf_x_g+pf_x_neigh;
   double pf_y=pf_y_g+pf_y_neigh;
-  // printf("\t\t-MASS PF vals:  %f  %f  %f  %f\n", pf_y_g, pf_y_neigh, pf_x_g, pf_x_neigh);
 
   pf_x_neigh=0;
   pf_y_neigh=0;
 
  // Update theta acceleration
   targ_theta=atan2(pf_y, pf_x);
+  // printf("\t\t-MASS PF vals:  %f/%f  %f/%f  %f\n", pf_x, pf_x_g, pf_y, pf_y_g, targ_theta);
   // printf("\t\t-MASS update:  %f  %f\n", targ_theta, heading);
   double theta_diff=targ_theta-heading;
   if (theta_diff<-M_PI) theta_diff+=2*M_PI;
@@ -47,11 +47,17 @@ void MassAgent::updateVel()
   theta_acc=theta_diff;
   if (theta_acc>vel_theta_max) theta_acc=vel_theta_max;
   else if (theta_acc<-vel_theta_max) theta_acc=-vel_theta_max;
+  // printf("\t\t-Turning info:\n");
+  // printf("\t\t\t- Agent heading:  %f\n", heading);
+  // printf("\t\t\t- Target heading:  %f\n", targ_theta);
+  // printf("\t\t\t- Theta speed:  %f\n", theta_acc);
   
  // Update velocity magnitude
-  vel_mag=vel_max*(1-abs(theta_diff)/M_PI);
+  vel_mag=vel_max*(1-abs(targ_theta)/M_PI);
+  // vel_mag=0;
   if (vel_mag<0) vel_mag=0;
   else if (vel_mag>vel_max) vel_mag=vel_max;
+  travel_time+=1;
 }
 
 /* 
@@ -126,6 +132,28 @@ void MassAgent::updateSituation(agent* neighbour)
   return;
 }
 
+
+void MassAgent::recordGoalTime()
+{
+  if (travel_time==0) return;
+  goal_travel_times.push_back(travel_time);
+
+  outfile.open(filename, std::ios_base::app);
+  outfile << travel_time << std::endl; 
+  outfile.close();
+  
+  float counts=size(goal_travel_times);
+  if (counts>0)
+  {
+    avg_goal_travel_time=0.0;
+    for (auto time : goal_travel_times) avg_goal_travel_time+=(time/counts);
+  }
+  travel_time=0.0;
+  printf("Average traveling time is: %f  (success count is %i)\n", avg_goal_travel_time, int(counts));
+  return;
+}
+
+
 int MassAgent::situationID()
 {
   if (shortest_ttc_bin==-1) return 0; // TTC violation
@@ -171,10 +199,12 @@ int MassAgent::situationID()
   return situation_id;
 }
 
+
 void MassAgent::setPrevSituation()
 {
   prev_situation=situationID();
 }
+
 
 void MassAgent::updateNeighPF(agent* neighbour)
 {
@@ -191,11 +221,21 @@ void MassAgent::updateNeighPF(agent* neighbour)
 
 double MassAgent::getGoalDist(double pos_x, double pos_y)
 {
-  double relative_targ_x=getRelativeGoal(pos_x, targ_x, var_x);
-  double relative_targ_y=getRelativeGoal(pos_y, targ_y, var_y);
-  double x_dist=pos_x-relative_targ_x;
-  double y_dist=pos_y-relative_targ_y;
+  // printf("\t\t- Positions and goal dist:   \n");
+  // printf("\t\t\t- MASS position:  (%f, %f)\n", pos_x, pos_y);
+  // printf("\t\t\t- Goal position:  (%f (%f), %f (%f))\n", targ_x, var_x, targ_y, var_y);
+  // double relative_targ_x=getRelativeGoal(pos_x, targ_x, var_x);
+  // double relative_targ_y=getRelativeGoal(pos_y, targ_y, var_y);
+  // printf("\t\t\t- Relative goal position:  (%f, %f)\n", relative_targ_x, relative_targ_y);
+  // double x_dist=pos_x-relative_targ_x;
+  // double y_dist=pos_y-relative_targ_y;
+  
+  double x_dist=pos_x-targ_x;
+  double y_dist=pos_y-targ_y;
   double dist=sqrt(x_dist*x_dist+y_dist*y_dist);
+
+  // printf("\t\t\t- Distance:  %f\n", dist);
+  
   return dist;
 }
 

@@ -4,7 +4,11 @@ import os
 # Create a parser instance
 # config = configparser.ConfigParser()
 config=configparser.SafeConfigParser(os.environ)
+<<<<<<< HEAD
 config_file = f'{os.getenv("SAVE_DIR_PATH")}/src/config.ini'
+=======
+config_file = f'{os.getenv("SAVE_DIR_PATH")}/config.ini'
+>>>>>>> 2cb06d873ee7a8dc65b9c1585ebf488ee46e0209
 if not os.path.exists(config_file):
 	raise FileNotFoundError(f"Configuration file '{config_file}' not found.")
 config.read(config_file)

@@ -27,6 +27,8 @@ class MassAgent : public agent
 
       collision_thresh=config["collision threshold"].as<float>();
 
+      // goal_time_thresh=config["goal time threshold"].as<float>();
+
      // Set potential field weight
       YAML::Node potential_field_weights=config["potential field weights"];
       {
@@ -102,6 +104,7 @@ class MassAgent : public agent
       printf("\t\t-Total situations:  %i\n", total_situations);
      // Set up transitions output file (if it does not exist); otherwise load current transition count
       // printf("\t - Does file [%s] exist:  %i\n", (results_dir+"/"+transition_filename).data(), filesystem::exists(results_dir+"/"+transition_filename));
+      // goal_sit=total_situations;
       if(!filesystem::exists(results_dir+"/"+transition_filename))
       {
         printf("\t\t-Creating new CSV file for transitions\n");
@@ -172,6 +175,7 @@ class MassAgent : public agent
     float getCollisionThresh();
     int getTTCThresh();
     int getShortestTTC();
+    void recordGoalTime();
     struct neighLocation getNeighLocation(agent* neighbour);
 
 
@@ -203,6 +207,13 @@ class MassAgent : public agent
     vector<vector<int>> state_trans_count; // Raw counts of transitions
     vector<vector<float>> state_transitions; // Converted to probabilities
     int prev_situation;
+    // bool goal_reached=false;
+
+   // Recording goal times
+    float goal_time_thresh;
+    vector<float> goal_travel_times; // record goal travelling times
+    float avg_goal_travel_time;
+    float travel_time=0.0;
 
    // Recording transition info
     string transition_filename;
